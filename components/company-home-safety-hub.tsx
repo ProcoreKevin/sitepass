@@ -3,6 +3,8 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { Loader2, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useSplitView } from "@/components/workspace-shell"
+import type { RiskHeatmapIncidentItem, RiskHeatmapObservationItem } from "@/components/split-view-panel"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import {
@@ -198,6 +200,70 @@ const HEATMAP_ROWS: { category: string; scores: readonly [number, number, number
   { category: "Heat Stress", scores: [81, 74, 69, 86] },
   { category: "Trenching", scores: [100, 89, 100, 100] },
 ]
+
+function hashSeed(s: string): number {
+  let h = 2166136261
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return h >>> 0
+}
+
+/** Demo incidents & observations for the split view; counts scale with score (lower → more incidents). */
+function buildHeatmapCellContributions(
+  category: string,
+  project: string,
+  score: number,
+): { incidents: RiskHeatmapIncidentItem[]; observations: RiskHeatmapObservationItem[] } {
+  const seed = hashSeed(`${category}|${project}|${score}`)
+  const locales = ["north stair", "floor 8 slab", "loading dock", "east perimeter", "south crane", "deck pour line"]
+  const loc = locales[seed % locales.length]
+
+  const incidentCount = score < 40 ? 3 : score < 55 ? 2 : score < 75 ? 1 : score < 92 ? 1 : 0
+  const observationCount = Math.min(6, 3 + (seed % 4))
+
+  const incidentTemplates = [
+    `${category}: struck-by / caught-in near miss — ${loc}`,
+    `${category}: equipment contact during pick — ${loc} (${project})`,
+    `${category}: slip or trip hazard escalated — ${loc}`,
+    `${category}: PPE gap noted on walk — ${loc}`,
+    `${category}: environmental exceedance suspected — ${loc} (${project})`,
+  ]
+
+  const severities: RiskHeatmapIncidentItem["severity"][] = ["Low", "Medium", "High"]
+  const incidents: RiskHeatmapIncidentItem[] = []
+  for (let i = 0; i < incidentCount; i++) {
+    const si = (seed + i * 17) % 3
+    incidents.push({
+      id: `inc-${category}-${project}-${i}`,
+      number: `INC-${10000 + ((seed + i * 131) % 8999)}`,
+      title: incidentTemplates[(seed + i * 5) % incidentTemplates.length],
+      date: `Mar ${1 + ((seed + i * 3) % 27)}, 2026`,
+      severity: severities[si],
+    })
+  }
+
+  const obsTemplates = [
+    `Positive observation: ${category.toLowerCase()} controls verified at ${loc}`,
+    `Toolbox follow-up logged for ${category.toLowerCase()} — ${project}`,
+    `Site walk: good housekeeping and signage for ${category.toLowerCase()} scope`,
+    `Pre-task plan reviewed with crew — ${category} work at ${loc}`,
+    `Hazard ID card submitted for ${category.toLowerCase()} — ${loc}`,
+  ]
+
+  const observations: RiskHeatmapObservationItem[] = []
+  for (let i = 0; i < observationCount; i++) {
+    observations.push({
+      id: `obs-${category}-${project}-${i}`,
+      number: `OBS-${22000 + ((seed + i * 109) % 6999)}`,
+      title: obsTemplates[(seed + i * 7) % obsTemplates.length],
+      date: `Mar ${1 + ((seed + i * 5) % 27)}, 2026`,
+    })
+  }
+
+  return { incidents, observations }
+}
 
 function describeArc(cx: number, cy: number, r: number, startDeg: number, endDeg: number) {
   const rad = (d: number) => (d * Math.PI) / 180
@@ -465,6 +531,7 @@ function ToolboxStackedBars() {
 }
 
 function RiskRatioHeatmapCard() {
+  const { openSplitView } = useSplitView()
   const [dateRange, setDateRange] = useState("30d")
   const [incidentWeight, setIncidentWeight] = useState("1x")
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
@@ -531,6 +598,23 @@ function RiskRatioHeatmapCard() {
   useEffect(() => {
     expandedCategories.forEach((category) => loadHazardSummary(category))
   }, [expandedCategories, loadHazardSummary])
+
+  const dateRangeLabel =
+    dateRange === "30d" ? "Last 30 days" : dateRange === "7d" ? "Last 7 days" : "Last 90 days"
+
+  const openHeatmapCellDetail = (category: string, project: (typeof HEATMAP_PROJECTS)[number], score: number) => {
+    const { incidents, observations } = buildHeatmapCellContributions(category, project, score)
+    openSplitView({
+      type: "risk-heatmap-cell",
+      heatmapCategory: category,
+      heatmapProject: project,
+      heatmapScore: score,
+      dateRangeLabel,
+      incidentWeightLabel: incidentWeight,
+      incidents,
+      observations,
+    })
+  }
 
   return (
     <SafetyWidgetCard
@@ -640,14 +724,18 @@ function RiskRatioHeatmapCard() {
                       </td>
                       {row.scores.map((score, i) => {
                         const cellStyle = heatmapScoreStyle(score)
+                        const project = HEATMAP_PROJECTS[i]
                         return (
-                          <td key={HEATMAP_PROJECTS[i]} className="px-2 py-1.5 text-center align-middle">
-                            <span
-                              className="inline-flex min-w-[2.5rem] justify-center rounded-[var(--border-radius-md)] px-2.5 py-1 text-center text-sm font-semibold tabular-nums"
+                          <td key={project} className="px-2 py-1.5 text-center align-middle">
+                            <button
+                              type="button"
+                              className="inline-flex min-w-[2.5rem] cursor-pointer justify-center rounded-[var(--border-radius-md)] px-2.5 py-1 text-center text-sm font-semibold tabular-nums transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                               style={cellStyle}
+                              onClick={() => openHeatmapCellDetail(row.category, project, score)}
+                              aria-label={`Open incidents and observations for ${row.category} at ${project}, safety score ${score}`}
                             >
                               {score}
-                            </span>
+                            </button>
                           </td>
                         )
                       })}
@@ -721,7 +809,8 @@ function RiskRatioHeatmapCard() {
           <p>
             Higher scores (green) indicate more proactive hazard identification relative to incidents.
             Lower scores (orange and red) suggest more incidents relative to observations and may need
-            intervention. Expand a row to review contributing conditions and behaviors.
+            intervention. Click a score to see incidents and observations counted for that cell, or expand a
+            row for an AI summary of contributing conditions and behaviors.
           </p>
         </div>
       </div>

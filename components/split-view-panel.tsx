@@ -8,6 +8,21 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ChevronDownIcon } from "lucide-react"
 
+export type RiskHeatmapIncidentItem = {
+  id: string
+  number: string
+  title: string
+  date: string
+  severity: "Low" | "Medium" | "High"
+}
+
+export type RiskHeatmapObservationItem = {
+  id: string
+  number: string
+  title: string
+  date: string
+}
+
 interface SplitViewPanelProps {
   isOpen: boolean
   onClose: () => void
@@ -16,9 +31,9 @@ interface SplitViewPanelProps {
   assistWidth: number
   workspaceWidth: number
   rfiData?: {
-    type?: "rfi" | "commitment"
-    number: number | string
-    status: string
+    type?: "rfi" | "commitment" | "risk-heatmap-cell"
+    number?: number | string
+    status?: string
     subject?: string
     title?: string
     description?: string
@@ -34,6 +49,14 @@ interface SplitViewPanelProps {
     location?: string
     ballInCourt?: string
     assignees?: string
+    /** Risk-Ratio Heatmap cell detail */
+    heatmapCategory?: string
+    heatmapProject?: string
+    heatmapScore?: number
+    dateRangeLabel?: string
+    incidentWeightLabel?: string
+    incidents?: RiskHeatmapIncidentItem[]
+    observations?: RiskHeatmapObservationItem[]
   }
   onNavigateUp?: () => void
   onNavigateDown?: () => void
@@ -86,6 +109,7 @@ export function SplitViewPanel({
   const actualWidth = (fullWorkspaceWidth * width) / 100
 
   const isCommitment = data?.type === "commitment"
+  const isRiskHeatmap = data?.type === "risk-heatmap-cell"
 
   return (
     <div
@@ -98,48 +122,86 @@ export function SplitViewPanel({
     >
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border-default px-6 py-4 border-none">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onNavigateUp} disabled={!canNavigateUp}>
-              <ChevronUp className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={onNavigateDown}
-              disabled={!canNavigateDown}
-            >
-              <ChevronDown className="h-5 w-5" />
-            </Button>
-          </div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold">
-              {isCommitment ? `Commitment ${data.number}` : `RFI #${data.number}`}
-            </h2>
-            <Badge variant="secondary" className="bg-background-secondary text-foreground-primary">
-              {data.status}
-            </Badge>
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          {!isRiskHeatmap && (
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onNavigateUp} disabled={!canNavigateUp}>
+                <ChevronUp className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={onNavigateDown}
+                disabled={!canNavigateDown}
+              >
+                <ChevronDown className="h-5 w-5" />
+              </Button>
+            </div>
+          )}
+          <div className="min-w-0 flex flex-col gap-0.5">
+            {isRiskHeatmap ? (
+              <>
+                <h2 className="truncate text-lg font-semibold">
+                  {data.heatmapCategory} · {data.heatmapProject}
+                </h2>
+                <p className="text-sm text-foreground-secondary">
+                  Safety score {data.heatmapScore}
+                  {data.dateRangeLabel ? ` · ${data.dateRangeLabel}` : ""}
+                  {data.incidentWeightLabel ? ` · Weight ${data.incidentWeightLabel}` : ""}
+                </p>
+              </>
+            ) : (
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-lg font-semibold">
+                  {isCommitment ? `Commitment ${data.number}` : `RFI #${data.number}`}
+                </h2>
+                <Badge variant="secondary" className="bg-background-secondary text-foreground-primary">
+                  {data.status}
+                </Badge>
+              </div>
+            )}
           </div>
         </div>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Edit className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <ExternalLink className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
+        <div className="flex shrink-0 items-center gap-1">
+          {!isRiskHeatmap && (
+            <>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Edit className="h-5 w-5" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <ExternalLink className="h-5 w-5" />
+              </Button>
+            </>
+          )}
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose} aria-label="Close panel">
             <X className="h-5 w-5" />
           </Button>
         </div>
       </div>
 
-      {isCommitment ? <CommitmentContent data={data} /> : <RFIContent data={data} />}
+      {isRiskHeatmap ? (
+        <RiskHeatmapCellContent data={data} />
+      ) : isCommitment ? (
+        <CommitmentContent data={data} />
+      ) : (
+        <RFIContent data={data} />
+      )}
 
       {/* Sticky Footer */}
       <div className="flex h-14 items-center justify-between border-t border-border-default px-6">
-        {isCommitment ? (
+        {isRiskHeatmap ? (
+          <div className="flex w-full justify-end">
+            <Button
+              type="button"
+              size="sm"
+              className="bg-foreground-primary text-background-primary hover:bg-foreground-primary/90"
+              onClick={onClose}
+            >
+              Done
+            </Button>
+          </div>
+        ) : isCommitment ? (
           <>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" className="gap-2 bg-transparent">
@@ -189,6 +251,68 @@ export function SplitViewPanel({
           </>
         )}
       </div>
+    </div>
+  )
+}
+
+function RiskHeatmapCellContent({ data }: { data: NonNullable<SplitViewPanelProps["rfiData"]> }) {
+  const incidents = data.incidents ?? []
+  const observations = data.observations ?? []
+
+  return (
+    <div className="flex-1 overflow-y-auto px-6 py-6">
+      <p className="mb-6 text-sm leading-relaxed text-foreground-secondary">
+        Incidents and observations in this period that were tagged with this hazard category and counted toward the
+        score for this project.
+      </p>
+
+      <section className="mb-8">
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-foreground-secondary">Incidents</h3>
+        {incidents.length === 0 ? (
+          <p className="text-sm text-foreground-secondary">No incidents in this cell for the selected range.</p>
+        ) : (
+          <ul className="divide-y divide-border-default rounded-md border border-border-default">
+            {incidents.map((item) => (
+              <li key={item.id} className="flex flex-col gap-1 px-4 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-mono text-xs text-foreground-secondary">{item.number}</span>
+                  <Badge
+                    variant="secondary"
+                    className={
+                      item.severity === "High"
+                        ? "border-destructive/30 bg-destructive/10 text-destructive"
+                        : item.severity === "Medium"
+                          ? "border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200"
+                          : "bg-background-secondary text-foreground-primary"
+                    }
+                  >
+                    {item.severity}
+                  </Badge>
+                </div>
+                <p className="text-sm font-medium text-foreground-primary">{item.title}</p>
+                <p className="text-xs text-foreground-secondary">{item.date}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section>
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-foreground-secondary">Observations</h3>
+        {observations.length === 0 ? (
+          <p className="text-sm text-foreground-secondary">No observations in this cell for the selected range.</p>
+        ) : (
+          <ul className="divide-y divide-border-default rounded-md border border-border-default">
+            {observations.map((item) => (
+              <li key={item.id} className="flex flex-col gap-1 px-4 py-3">
+                <span className="font-mono text-xs text-foreground-secondary">{item.number}</span>
+                <p className="text-sm font-medium text-foreground-primary">{item.title}</p>
+                <p className="text-xs text-foreground-secondary">{item.date}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   )
 }
