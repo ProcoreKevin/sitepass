@@ -1,0 +1,49 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "overrides": [
+    {
+      "files": ["**/*.{ts,tsx}"],
+      "excludedFiles": [
+        "app/**/*.{ts,tsx}",
+        "components/ui/**/*.{ts,tsx}",
+        "components/ui-next/**/*.{ts,tsx}",
+        "Design-System/**/*.{ts,tsx}"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@untitledui/react", "@untitledui/react/**"],
+                "message": "Use @/components/ui/* (or ui-next facades). Do not import @untitledui/react outside components/ui, components/ui-next, or Design-System."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@/hooks/use-toast",
+                "message": "Import toast / useToast from @/lib/toast; @/hooks/* is Design-System-only."
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["@untitledui/react", "@untitledui/react/**"],
+                "message": "Use @/components/ui/* (or ui-next facades). Do not import @untitledui/react outside components/ui, components/ui-next, or Design-System."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,569 @@
+/* Local @untitledui/react (Design-System): theme + RAC plugin; legacy NGX wins in `legacy-theme` layer. */
+@layer base, react-aria, untitled-ui, legacy-theme;
+
+@import "tailwindcss";
+@plugin "tailwindcss-react-aria-components";
+@plugin "@tailwindcss/typography";
+@import "../Design-System/styles/ngx-canonical-tokens.css" layer(untitled-ui);
+@import "../Design-System/styles/theme.css" layer(untitled-ui);
+@import "./uui-ngx-token-bridge.css" layer(untitled-ui);
+@import "../Design-System/styles/typography.css" layer(untitled-ui);
+@source "../Design-System/**/*.tsx";
+@source "../Design-System/**/*.ts";
+@source "../components/**/*.tsx";
+@source "../app/**/*.tsx";
+
+@import "tw-animate-css";
+@import "./legacy-theme.css" layer(legacy-theme);
+
+/* Match next-themes `.dark` and Untitled’s `.dark-mode` root (see theme-provider sync). */
+@custom-variant dark (&:is(.dark *, .dark-mode *));
+
+/* Implementing comprehensive NGEX design token system from JSON specification */
+:root {
+  /* Adding text scaling system for density modes */
+  /* Text Scale Factor - Controls global text sizing based on density preference */
+  --text-scale: 1; /* Default scale for compact mode */
+
+  /* Base font size that will be scaled */
+  --font-size-base: 1rem; /* 16px default */
+
+  /* Scaled font sizes using calc() with scale factor */
+  --font-size-xs: calc(0.75rem * var(--text-scale)); /* 12px → 13.2px */
+  --font-size-sm: calc(0.875rem * var(--text-scale)); /* 14px → 15.4px */
+  --font-size-base: calc(1rem * var(--text-scale)); /* 16px → 17.6px */
+  --font-size-lg: calc(1.125rem * var(--text-scale)); /* 18px → 19.8px */
+  --font-size-xl: calc(1.25rem * var(--text-scale)); /* 20px → 22px */
+  --font-size-2xl: calc(1.5rem * var(--text-scale)); /* 24px → 26.4px */
+  --font-size-3xl: calc(1.875rem * var(--text-scale)); /* 30px → 33px */
+  --font-size-4xl: calc(2.25rem * var(--text-scale)); /* 36px → 39.6px */
+  --font-size-5xl: calc(3rem * var(--text-scale)); /* 48px → 52.8px */
+  --font-size-6xl: calc(3.75rem * var(--text-scale)); /* 60px → 66px */
+  --font-size-7xl: calc(4.5rem * var(--text-scale)); /* 72px → 79.2px */
+  --font-size-8xl: calc(6rem * var(--text-scale)); /* 96px → 105.6px */
+  --font-size-9xl: calc(8rem * var(--text-scale)); /* 128px → 140.8px */
+
+  /* Grayscale - Asphalt Scale */
+  --asphalt-25: #fafafa;
+  --asphalt-50: #f9f9f9;
+  --asphalt-100: #f5f5f5;
+  --asphalt-200: #e5e5e5;
+  --asphalt-300: #d4d4d4;
+  --asphalt-400: #a3a3a3;
+  --asphalt-500: #737373;
+  --asphalt-600: #525252;
+  --asphalt-700: #404040;
+  --asphalt-800: #262626;
+  --asphalt-900: #171717;
+  --white: #ffffff;
+  --black: #000000;
+
+  /* Semantic Colors - Success */
+  --success-25: #f0fdf4;
+  --success-400: #4ade80;
+  --success-800: #166534;
+
+  /* Semantic Colors - Attention */
+  --attention-25: #fefce8;
+  --attention-50: #fefce8;
+  --attention-700: #a16207;
+  --attention-900: #713f12;
+
+  /* Semantic Colors - Danger */
+  --danger-25: #fef2f2;
+  --danger-50: #fef2f2;
+  --danger-400: #f87171;
+  --danger-500: #ef4444;
+  --danger-600: #dc2626;
+  --danger-800: #991b1b;
+
+  /* Semantic Colors - Informative */
+  --informative-25: #eff6ff;
+  --informative-50: #eff6ff;
+  --informative-600: #2563eb;
+  --informative-800: #1e40af;
+
+  /* Semantic Colors - Copilot */
+  --copilot-500: #ff5200;
+  --copilot-600: #ea580c;
+
+  /* Brand palette — Guidelines.md (chart / warm surfaces); user chat bubbles, etc. */
+  --brand-stone: #ece0d6;
+
+  /* Semantic Colors - Pilot */
+  --pilot-25: #ecfeff;
+  --pilot-700: #0e7490;
+
+  /* Semantic Colors - Beta */
+  --beta-25: #fdf4ff;
+  --beta-700: #a21caf;
+
+  /* BIM Model Colors - for 3D visualization */
+  --bim-selected: var(--copilot-500);
+  --bim-foundation: var(--asphalt-600);
+  --bim-column: var(--asphalt-500);
+  --bim-floor: var(--asphalt-400);
+  --bim-wall: var(--asphalt-300);
+  --bim-hvac: var(--informative-600);
+  --bim-electrical: var(--attention-700);
+  --bim-plumbing: var(--informative-600);
+
+  /* Chart Colors - for project health visualization */
+  --chart-on-budget-on-schedule: var(--asphalt-500);
+  --chart-on-budget-off-schedule: var(--asphalt-400);
+  --chart-over-budget-on-schedule: var(--asphalt-800);
+  --chart-over-budget-off-schedule: var(--asphalt-300);
+
+  /* Status Colors - for project status indicators */
+  --status-construction: var(--success-400);
+  --status-pre-construction: var(--informative-600);
+  --status-planning: var(--danger-600);
+
+  /* Progress Bar Colors */
+  --progress-bar: var(--copilot-500);
+
+  /* Trend Indicator Colors */
+  --trend-up: var(--success-800);
+  --trend-down: var(--danger-500);
+
+  /* Foreground Tokens */
+  --foreground-primary: var(--asphalt-900);
+  --foreground-secondary: var(--asphalt-600);
+  --foreground-tertiary: var(--asphalt-500);
+  --foreground-disabled: var(--asphalt-400);
+  --foreground-inverse: var(--white);
+  --foreground-active: var(--asphalt-900);
+  --foreground-active-hover: var(--asphalt-700);
+  --foreground-danger: var(--danger-500);
+
+  /* Background Tokens */
+  --background-primary: var(--asphalt-50);
+  --background-secondary: var(--asphalt-100);
+  --background-tertiary: var(--asphalt-200);
+
+  /* Border Tokens */
+  --border-default: var(--asphalt-200);
+  --border-hover: var(--asphalt-900);
+  --border-focus: var(--asphalt-900);
+  --border-danger: var(--danger-500);
+  --border-active: var(--asphalt-900);
+  --border-inactive: var(--asphalt-200);
+
+  /* Text Link Tokens */
+  --link: #111111;
+  --link-hover: #ff5200;
+
+  /* Badge Tokens */
+  --badge-primary-bg: #000000;
+  --badge-primary-text: #ffffff;
+  --badge-secondary-bg: #e5e5e5;
+  --badge-secondary-text: #171717;
+  --badge-information-bg: #2563eb;
+  --badge-information-text: #ffffff;
+  --badge-success-bg: #166534;
+  --badge-success-text: #ffffff;
+  --badge-critical-bg: #dc2626;
+  --badge-critical-text: #ffffff;
+  --badge-warning-bg: #ea580c;
+  --badge-warning-text: #ffffff;
+
+  /* Theme surfaces (--primary, --background, --card, …) are defined under
+     [data-theme="legacy"] in legacy-theme.css (Tailwind + Untitled contract).
+     Do NOT redefine them here — unlayered :root can break cascade. */
+  --radius: 0.25rem;
+
+  /* Semantic component tokens — RAC / Untitled (values from legacy-theme when active) */
+  --uui-button-primary-bg: var(--primary, var(--copilot-500));
+  --uui-button-primary-fg: var(--primary-foreground, var(--white));
+  --uui-button-secondary-bg: var(--secondary, var(--asphalt-200));
+  --uui-button-secondary-fg: var(--secondary-foreground, var(--asphalt-900));
+  --uui-button-destructive-bg: var(--destructive, var(--danger-600));
+  --uui-button-destructive-fg: var(--destructive-foreground, var(--white));
+  --uui-button-ghost-fg: var(--foreground, var(--foreground-primary));
+  --uui-button-outline-border: var(--border, var(--border-default));
+  --uui-input-bg: var(--background, var(--background-primary));
+  --uui-input-fg: var(--foreground, var(--foreground-primary));
+  --uui-input-placeholder: var(--muted-foreground, var(--foreground-tertiary));
+  --uui-input-border-default: var(--input, var(--border-default));
+  --uui-input-border-focus: var(--ring, var(--informative-600));
+  --uui-focus-ring: var(--ring, var(--informative-600));
+  --uui-overlay-backdrop: rgb(0 0 0 / 0.5);
+
+  /* Brand ramp: `uui-ngx-token-bridge.css` + `[data-theme="legacy"]` (legacy-theme.css) map
+     `--color-brand-*` → `--ds-brand-*`. Do not redefine `--color-brand-*` here — unlayered
+     `:root` overrides beat `@layer legacy-theme` and caused a cycle with `--primary` →
+     `--color-brand-500` → `var(--uui-brand-base)` → `var(--primary)`, breaking fills. */
+  --color-focus-ring: var(--uui-focus-ring);
+}
+
+/* Adding comfortable density mode with 10% larger text */
+[data-density="comfortable"] {
+  --text-scale: 1.1;
+}
+
+.dark {
+  /* Foreground Tokens - Dark Mode */
+  --foreground-primary: var(--white);
+  --foreground-secondary: var(--asphalt-300);
+  --foreground-tertiary: var(--asphalt-400);
+  --foreground-disabled: var(--asphalt-500);
+  --foreground-inverse: var(--asphalt-900);
+  --foreground-active: var(--white);
+  --foreground-active-hover: var(--asphalt-300);
+  --foreground-danger: var(--danger-400);
+
+  /* Background Tokens - Dark Mode */
+  --background-primary: var(--asphalt-900);
+  --background-secondary: var(--asphalt-800);
+  --background-tertiary: var(--asphalt-700);
+
+  /* Border Tokens - Dark Mode */
+  --border-default: var(--asphalt-700);
+  --border-hover: var(--white);
+  --border-focus: var(--white);
+  --border-danger: var(--danger-600);
+  --border-active: var(--white);
+  --border-inactive: var(--asphalt-800);
+
+  /* Text Link Tokens - Dark Mode */
+  --link: var(--white);
+  --link-hover: #ff5200;
+
+  /* NGX semantic dark tokens. Legacy Tailwind / Untitled bridge vars for dark live in
+     app/legacy-theme.css (`html.dark[data-theme="legacy"]`). */
+}
+
+@theme inline {
+  /* Motion — `duration-ds-*` / `ease-ds-*` utilities → canonical `--ds-motion-*` */
+  --duration-ds-short: var(--ds-motion-duration-short);
+  --duration-ds-medium: var(--ds-motion-duration-medium);
+  --duration-ds-long: var(--ds-motion-duration-long);
+  --ease-ds-standard: var(--ds-motion-easing-standard);
+  --ease-ds-emphasized: var(--ds-motion-easing-emphasized);
+
+  /* Font Size Utilities - Connected to CSS Variables for Dynamic Scaling */
+  --font-size-xs: var(--font-size-xs);
+  --font-size-sm: var(--font-size-sm);
+  --font-size-base: var(--font-size-base);
+  --font-size-lg: var(--font-size-lg);
+  --font-size-xl: var(--font-size-xl);
+  --font-size-2xl: var(--font-size-2xl);
+  --font-size-3xl: var(--font-size-3xl);
+  --font-size-4xl: var(--font-size-4xl);
+  --font-size-5xl: var(--font-size-5xl);
+  --font-size-6xl: var(--font-size-6xl);
+  --font-size-7xl: calc(4.5rem * var(--text-scale));
+  --font-size-8xl: calc(6rem * var(--text-scale));
+  --font-size-9xl: calc(8rem * var(--text-scale));
+
+  /* Grayscale - Asphalt Scale */
+  --color-asphalt-25: var(--asphalt-25);
+  --color-asphalt-50: var(--asphalt-50);
+  --color-asphalt-100: var(--asphalt-100);
+  --color-asphalt-200: var(--asphalt-200);
+  --color-asphalt-300: var(--asphalt-300);
+  --color-asphalt-400: var(--asphalt-400);
+  --color-asphalt-500: var(--asphalt-500);
+  --color-asphalt-600: var(--asphalt-600);
+  --color-asphalt-700: var(--asphalt-700);
+  --color-asphalt-800: var(--asphalt-800);
+  --color-asphalt-900: var(--asphalt-900);
+  --color-white: var(--white);
+  --color-black: var(--black);
+
+  /* Semantic Colors */
+  --color-success-25: var(--success-25);
+  --color-success-400: var(--success-400);
+  --color-success-800: var(--success-800);
+  --color-attention-25: var(--attention-25);
+  --color-attention-50: var(--attention-50);
+  --color-attention-700: var(--attention-700);
+  --color-attention-900: var(--attention-900);
+  --color-danger-25: var(--danger-25);
+  --color-danger-50: var(--danger-50);
+  --color-danger-400: var(--danger-400);
+  --color-danger-500: var(--danger-500);
+  --color-danger-600: var(--danger-600);
+  --color-danger-800: var(--danger-800);
+  --color-informative-25: var(--informative-25);
+  --color-informative-50: var(--informative-50);
+  --color-informative-600: var(--informative-600);
+  --color-informative-800: var(--informative-800);
+  --color-copilot-500: var(--copilot-500);
+  --color-copilot-600: var(--copilot-600);
+  --color-brand-stone: var(--brand-stone);
+  --color-pilot-25: var(--pilot-25);
+  --color-pilot-700: var(--pilot-700);
+  --color-beta-25: var(--beta-25);
+  --color-beta-700: var(--beta-700);
+
+  /* BIM Model Color Tokens */
+  --color-bim-selected: var(--bim-selected);
+  --color-bim-foundation: var(--bim-foundation);
+  --color-bim-column: var(--bim-column);
+  --color-bim-floor: var(--bim-floor);
+  --color-bim-wall: var(--bim-wall);
+  --color-bim-hvac: var(--bim-hvac);
+  --color-bim-electrical: var(--bim-electrical);
+  --color-bim-plumbing: var(--bim-plumbing);
+
+  /* Chart Color Tokens */
+  --color-chart-on-budget-on-schedule: var(--chart-on-budget-on-schedule);
+  --color-chart-on-budget-off-schedule: var(--chart-on-budget-off-schedule);
+  --color-chart-over-budget-on-schedule: var(--chart-over-budget-on-schedule);
+  --color-chart-over-budget-off-schedule: var(--chart-over-budget-off-schedule);
+
+  /* Status Color Tokens */
+  --color-status-construction: var(--status-construction);
+  --color-status-pre-construction: var(--status-pre-construction);
+  --color-status-planning: var(--status-planning);
+
+  /* Progress Bar Color Tokens */
+  --color-progress-bar: var(--progress-bar);
+
+  /* Trend Indicator Color Tokens */
+  --color-trend-up: var(--trend-up);
+  --color-trend-down: var(--trend-down);
+
+  /* Link Color Tokens */
+  --color-link: var(--link);
+  --color-link-hover: var(--link-hover);
+
+  /* Badge Color Tokens */
+  --color-badge-primary-bg: var(--badge-primary-bg);
+  --color-badge-primary-text: var(--badge-primary-text);
+  --color-badge-secondary-bg: var(--badge-secondary-bg);
+  --color-badge-secondary-text: var(--badge-secondary-text);
+  --color-badge-information-bg: var(--badge-information-bg);
+  --color-badge-information-text: var(--badge-information-text);
+  --color-badge-success-bg: var(--badge-success-bg);
+  --color-badge-success-text: var(--badge-success-text);
+  --color-badge-critical-bg: var(--badge-critical-bg);
+  --color-badge-critical-text: var(--badge-critical-text);
+  --color-badge-warning-bg: var(--badge-warning-bg);
+  --color-badge-warning-text: var(--badge-warning-text);
+
+  /* Semantic Design Tokens */
+  --color-foreground-primary: var(--foreground-primary);
+  --color-foreground-secondary: var(--foreground-secondary);
+  --color-foreground-tertiary: var(--foreground-tertiary);
+  --color-foreground-disabled: var(--foreground-disabled);
+  --color-foreground-inverse: var(--foreground-inverse);
+  --color-foreground-active: var(--foreground-active);
+  --color-foreground-active-hover: var(--foreground-active-hover);
+  --color-foreground-danger: var(--foreground-danger);
+  --color-background-primary: var(--background-primary);
+  --color-background-secondary: var(--background-secondary);
+  --color-background-tertiary: var(--background-tertiary);
+  --color-border-default: var(--border-default);
+  --color-border-hover: var(--border-hover);
+  --color-border-focus: var(--border-focus);
+  --color-border-danger: var(--border-danger);
+  --color-border-active: var(--border-active);
+  --color-border-inactive: var(--border-inactive);
+
+  /* UUI/RAC semantic → theme keys */
+  --color-button-primary-bg: var(--uui-button-primary-bg);
+  --color-button-primary-fg: var(--uui-button-primary-fg);
+  --color-button-secondary-bg: var(--uui-button-secondary-bg);
+  --color-button-secondary-fg: var(--uui-button-secondary-fg);
+  --color-button-destructive-bg: var(--uui-button-destructive-bg);
+  --color-button-destructive-fg: var(--uui-button-destructive-fg);
+  --color-button-ghost-fg: var(--uui-button-ghost-fg);
+  --color-button-outline-border: var(--uui-button-outline-border);
+  --color-input-bg: var(--uui-input-bg);
+  --color-input-fg: var(--uui-input-fg);
+  --color-input-placeholder: var(--uui-input-placeholder);
+  --color-input-border-default: var(--uui-input-border-default);
+  --color-input-border-focus: var(--uui-input-border-focus);
+  --color-focus-ring: var(--uui-focus-ring);
+  --color-overlay-backdrop: var(--uui-overlay-backdrop);
+
+  /* Tailwind color keys used by Untitled utilities (bg-card, border-border, …) */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Border Radius Tokens */
+  --radius-none: 0px;
+  --radius-sm: 0.125rem;
+  --radius-base: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Core Spacing Tokens */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  --spacing-2xl: 4rem;
+  --spacing-3xl: 6rem;
+  --spacing-4xl: 8rem;
+
+  /* Component-Specific Padding Tokens */
+  --spacing-component-padding-xs: 0.5rem;
+  --spacing-component-padding-sm: 1rem;
+  --spacing-component-padding-md: 1.5rem;
+  --spacing-component-padding-lg: 2rem;
+  --spacing-component-padding-xl: 3rem;
+
+  /* Component-Specific Gap Tokens */
+  --spacing-component-gap-xs: 0.5rem;
+  --spacing-component-gap-sm: 1rem;
+  --spacing-component-gap-md: 1.5rem;
+  --spacing-component-gap-lg: 2rem;
+  --spacing-component-gap-xl: 3rem;
+
+  /* Elevation/Shadow Tokens */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-none: none;
+
+  /* Semantic Elevation Tokens for Components */
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-card-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-dropdown: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-overlay: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  /* Drop Shadow Filters */
+  --drop-shadow-sm: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+  --drop-shadow-base: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  --drop-shadow-md: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.07));
+  --drop-shadow-lg: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04));
+  --drop-shadow-xl: drop-shadow(0 20px 13px rgba(0, 0, 0, 0.03));
+  --drop-shadow-2xl: drop-shadow(0 25px 25px rgba(0, 0, 0, 0.15));
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Font Family Tokens - Using Inter as primary sans-serif font */
+  --font-family-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+@layer base {
+  :root {
+    /* tw-animate / transition defaults — align with canonical motion tokens */
+    --tw-duration: var(--ds-motion-duration-medium);
+    --tw-ease: var(--ds-motion-easing-standard);
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background-primary text-foreground-primary;
+  }
+  /*
+   * Motion spine: `--ds-motion-duration-*` / `--motion-duration-*` and easing vars in
+   * Design-System/styles/ngx-canonical-tokens.css — prefer `duration-ds-short` /
+   * `ease-ds-standard` from `@theme`, or arbitrary `var(--ds-motion-*)`.
+   */
+}
+
+/* Override Tailwind's text size utilities to use our CSS variables for dynamic scaling */
+@layer utilities {
+  .text-xs {
+    font-size: var(--font-size-xs) !important;
+  }
+  .text-sm {
+    font-size: var(--font-size-sm) !important;
+  }
+  .text-base {
+    font-size: var(--font-size-base) !important;
+  }
+  .text-lg {
+    font-size: var(--font-size-lg) !important;
+  }
+  .text-xl {
+    font-size: var(--font-size-xl) !important;
+  }
+  .text-2xl {
+    font-size: var(--font-size-2xl) !important;
+  }
+  .text-3xl {
+    font-size: var(--font-size-3xl) !important;
+  }
+  .text-4xl {
+    font-size: var(--font-size-4xl) !important;
+  }
+  .text-5xl {
+    font-size: var(--font-size-5xl) !important;
+  }
+  .text-6xl {
+    font-size: var(--font-size-6xl) !important;
+  }
+  .text-7xl {
+    font-size: var(--font-size-7xl) !important;
+  }
+  .text-8xl {
+    font-size: var(--font-size-8xl) !important;
+  }
+  .text-9xl {
+    font-size: var(--font-size-9xl) !important;
+  }
+}
+
+/*
+ * RAC Radio <label>: mergeProps() joins className strings with clsx() (@react-aria/utils mergeProps.main.js ~44),
+ * so the node can carry both `flex` and `grid` utilities. Later @layer utilities wins over @layer untitled-ui,
+ * so `display:flex` can beat our grid. Unlayered + !important forces the intended row layout.
+ * DOM: VisuallyHidden span (row 1 full width), indicator + radio-text (row 2, two columns).
+ */
+.react-aria-Radio:has(> [data-slot="radio-indicator"]),
+[data-slot="radio-group-item"]:has(> [data-slot="radio-indicator"]) {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  align-items: start !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+.react-aria-Radio:has(> [data-slot="radio-indicator"]) > span:first-child,
+[data-slot="radio-group-item"]:has(> [data-slot="radio-indicator"]) > span:first-child {
+  grid-column: 1 / -1 !important;
+  grid-row: 1 !important;
+}
+.react-aria-Radio:has(> [data-slot="radio-indicator"]) > [data-slot="radio-indicator"],
+[data-slot="radio-group-item"]:has(> [data-slot="radio-indicator"]) > [data-slot="radio-indicator"] {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+}
+.react-aria-Radio:has(> [data-slot="radio-indicator"]) > [data-slot="radio-text"],
+[data-slot="radio-group-item"]:has(> [data-slot="radio-indicator"]) > [data-slot="radio-text"] {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  min-width: 0 !important;
+}

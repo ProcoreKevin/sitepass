@@ -1,0 +1,19 @@
+# Optional PR gate: design-token / pattern scanner (see docs/token-contract.md).
+name: Compliance
+
+on:
+  pull_request:
+    paths:
+      - "app/**"
+      - "components/ui/**"
+      - ".cursor/skills/ngx-design-system/scripts/check-compliance.sh"
+
+jobs:
+  compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run NGX compliance scanner
+        run: |
+          bash .cursor/skills/ngx-design-system/scripts/check-compliance.sh app
+          bash .cursor/skills/ngx-design-system/scripts/check-compliance.sh components/ui

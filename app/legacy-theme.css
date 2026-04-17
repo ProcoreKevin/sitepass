@@ -1,0 +1,2328 @@
+/* =============================================================================
+   PROCORE LEGACY THEME — Untitled UI v4 Native
+   Version: 2.1.0 — Untitled UI + React Aria + Tailwind v4
+   Format:  Tailwind CSS v4 — @layer base scoped to [data-theme="legacy"]
+            Single rgb() token system — no HSL, no dual format
+            Tailwind surface tokens (--background, --primary, --card, …) for UUI utilities
+            React Aria Components + Untitled UI @theme variable names throughout
+   Purpose: Stopgap skin — blends UUI components with legacy Procore pages.
+            Replicates current Procore component-based design system exactly.
+            OPTIMIZED: AI agents can use this file as the single source of truth.
+            Tailwind surface tokens and RAC/Untitled component hooks are mapped and annotated.
+            NOT WCAG compliant by design. Light-only. Will be deprecated.
+   Usage:   <html data-theme="legacy">  OR  class="theme-legacy"
+            Import AFTER Untitled UI base styles.
+            For Tailwind/Untitled: surface tokens map NGX legacy --color-* / --ds-* here.
+   Author:  Nathan Hardy · Procore Technologies · NGX Design System
+   Updated: March 2026
+
+   INTERACTIVE STATE POLICY (legacy theme):
+   Use primary neutral tokens for checked, selected, active tabs, sliders, progress
+   fills, table row emphasis, and similar “on” UI (e.g. --color-text-primary,
+   --color-border-strong, --color-bg-secondary). Reserve brand orange for the
+   primary CTA only: [data-slot="button"][data-variant="default"] (app <Button>).
+
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │  AI AGENT QUICK REFERENCE                                               │
+   │                                                                         │
+   │  Brand primary    #FF5200  →  var(--primary) / var(--color-brand-500)  │
+   │  Brand hover      #E64900  →  var(--color-brand-600)                   │
+   │  Nav background   #000000  →  var(--sidebar) / var(--color-bg-nav)     │
+   │  Page background  #F5F5F5  →  var(--background) / var(--color-bg-canvas)│
+   │  Card background  #FFFFFF  →  var(--card) / var(--color-bg-primary)    │
+   │  Focus ring       #2066DF  →  var(--ring) / var(--color-border-input-focus)│
+   │  Destructive rest #FEE2E2/#991B1B → --color-bg-feedback-danger /       │
+   │                   --color-text-danger (same as .banner-danger body)     │
+   │  Destructive hover solid → var(--destructive) + --destructive-foreground │
+   │  Body text        #111827  →  var(--foreground)                        │
+   │  Muted text       #6B7280  →  var(--muted-foreground)                  │
+   │  Border default   #E5E7EB  →  var(--border)                            │
+   │  Input border     #D1D5DB  →  var(--input)                             │
+   │                                                                         │
+   │  Button radius    4px      →  var(--radius-sm) / rounded-sm            │
+   │  Card radius      8px      →  var(--radius) / rounded-lg               │
+   │  Badge radius     pill     →  var(--radius-full) / rounded-full        │
+   │  Font             Inter    →  var(--font-sans) / font-sans             │
+   │  Body size        14px     →  text-sm (Tailwind)                       │
+   │  App Button       Untitled md/sm/lg/xl  →  @/components/ui/button       │
+   │  Input height     32px     →  h-8                                      │
+   │  Page margin      8px      →  p-2                                      │
+   │  Card padding     16px     →  p-4                                      │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+   CONFIRMED VALUES:
+   Brand primary    #FF5200  ✓     Brand hover      #E64900  ✓
+   Nav background   #000000  ✓     Selected row bg  neutral (bg-secondary + primary stripe) ✓
+   Link blue        #1D5CC9  ✓     Focus ring       #2066DF  ✓
+   Button radius    4px      ✓     Card radius      8px      ✓
+   Badge radius     pill     ✓     Font             Inter    ✓
+   Page margin      8px      ✓     Card padding     16px     ✓
+
+   SPATIAL TOKEN ISOLATION (intentional):
+   All radius and spacing values are LOCKED to the legacy visual spec.
+   They do NOT inherit from or cascade with NGX system tokens.
+   If --radius changes in ngx-light-theme.css, this theme is unaffected.
+
+   SECTION MAP:
+   01  Brand ramp
+   02  Surfaces
+   03  Foreground / text
+   04  Borders
+   05  Navigation
+   06  Badges
+   07  Radius — Tailwind + UUI @theme variable names (locked 4px / 8px / pill)
+   08  Spacing — 8px base unit (locked)
+   09  Component heights — mapped to Tailwind h-* utilities
+   10  Typography
+   11  Elevation
+   12  Data visualization — chart palette (9-color categorical)
+   13  Tailwind surface bridge — page/card/popover/primary tokens for UUI utilities
+   14  RAC / role hooks — overlays, menus, form controls (no Radix selectors)
+   15  Tailwind v4 @theme overrides
+   16  Element styles
+   17  Component styles
+   18  Overlay / popover presentation (RAC + Untitled)
+   19  Data visualization — component utilities
+   20  App dark mode (html.dark / .dark-mode + legacy tokens)
+   ============================================================================= */
+
+
+/* ============================================================================
+   TOKENS — @layer base scoped to [data-theme="legacy"]
+   ============================================================================ */
+
+@layer base {
+  [data-theme="legacy"],
+  .theme-legacy {
+
+
+    /* =========================================================================
+       01. BRAND RAMP
+       Seed: #FF5200. Hover: #E64900 (Legacy — differs from NGX #CB4100).
+       OKLCH perceptual uniformity across the ramp.
+
+       AI AGENT NOTE:
+       - Primary CTA → background: var(--color-brand-500)
+       - Hover state  → background: var(--color-brand-600)
+       - Active/pressed → background: var(--color-brand-700)
+       - Subtle tints (banners, selected rows) → var(--color-brand-25/50/100)
+       ========================================================================= */
+
+    --color-brand-25:  var(--ds-brand-25);
+    --color-brand-50:  var(--ds-brand-50);
+    --color-brand-100: var(--ds-brand-100);
+    --color-brand-200: var(--ds-brand-200);
+    --color-brand-300: var(--ds-brand-300);
+    --color-brand-400: var(--ds-brand-400);
+    --color-brand-500: var(--ds-brand-500);        /* #FF5200 ← PRIMARY CTA ✓         */
+    --color-brand-600: var(--ds-brand-600);        /* #E64900 ← HOVER (Legacy only) ✓ */
+    --color-brand-700: var(--ds-brand-700);        /* #CC3F00   pressed / dark accent  */
+    --color-brand-800: var(--ds-brand-800);        /* #9E3100   text on light surfaces */
+    --color-brand-900: var(--ds-brand-900);        /* #742400   dark text              */
+    --color-brand-950: var(--ds-brand-950);         /* #481600   near-black             */
+
+
+    /* =========================================================================
+       02. SURFACES
+       White card surfaces — legacy app uses pure white, not off-white.
+
+       AI AGENT NOTE: Surface hierarchy (single source — match app + docs) —
+         Page canvas   → var(--color-bg-canvas)    = #F5F5F5
+         Cards, panels, page headers, table thead/sticky chrome
+                       → var(--color-bg-primary)  = #FFFFFF
+         Subtle hover, zebra, muted strips, ghost-btn hover
+                       → var(--color-bg-secondary) = #F8F9FA
+         Dense toolbar / inset chrome (when distinct from primary)
+                       → var(--color-bg-tertiary)  = #F3F4F6
+         Active rows   → var(--color-bg-row-active) — neutral highlight (see tbody tr.active)
+       ========================================================================= */
+
+    --color-bg-canvas:           var(--ds-bg-canvas);
+    --color-bg-primary:          var(--ds-bg-primary);
+    --color-bg-secondary:        var(--ds-bg-secondary);
+    --color-bg-tertiary:         var(--ds-bg-tertiary);
+    --color-bg-disabled:         var(--ds-bg-disabled);
+
+    /* ── Secondary button gray ramp (confirmed #EEF0F1 default) ─────────────── */
+    --color-bg-btn-secondary:          var(--ds-bg-btn-secondary);
+    --color-bg-btn-secondary-hover:    var(--ds-bg-btn-secondary-hover);
+    --color-bg-btn-secondary-active:   var(--ds-bg-btn-secondary-active);
+    --color-bg-btn-secondary-disabled: var(--ds-bg-btn-secondary-disabled);
+    --color-bg-row-active:       var(--ds-bg-row-active);
+    --color-bg-overlay:          var(--ds-bg-overlay);
+
+    --color-bg-feedback-info:    var(--ds-bg-feedback-info);
+    --color-bg-feedback-success: var(--ds-bg-feedback-success);
+    --color-bg-feedback-warning: var(--ds-bg-feedback-warning);
+    --color-bg-feedback-danger:  var(--ds-bg-feedback-danger);
+
+
+    /* =========================================================================
+       03. FOREGROUND / TEXT
+       Based on Tailwind gray scale sampled from legacy Procore screenshots.
+
+       AI AGENT NOTE: Text hierarchy —
+         Primary values  → var(--color-text-primary)   = #111827
+         Labels/headers  → var(--color-text-secondary) = #374151
+         Metadata/hints  → var(--color-text-tertiary)  = #6B7280
+         Disabled        → var(--color-text-disabled)  = #9CA3AF
+         On dark/brand   → var(--color-text-inverse)   = #FFFFFF
+         Links           → var(--color-text-link)       = #1D5CC9
+       ========================================================================= */
+
+    --color-text-primary:    var(--ds-text-primary);
+    --color-text-secondary:  var(--ds-text-secondary);
+    --color-text-tertiary:   var(--ds-text-tertiary);
+    --color-text-disabled:   var(--ds-text-disabled);
+    --color-text-inverse:    var(--ds-text-inverse);
+    --color-text-placeholder: var(--ds-text-placeholder);
+
+    --color-text-link:       var(--ds-text-link);
+    --color-text-link-hover: var(--ds-text-link-hover);
+
+    --color-text-info:    var(--ds-text-info);
+    --color-text-success: var(--ds-text-success);
+    --color-text-warning: var(--ds-text-warning);
+    --color-text-danger:  var(--ds-text-danger);
+
+
+    /* =========================================================================
+       04. BORDERS
+       Three tiers: default (light), hover (mid), focus (brand blue ✓).
+       Input and component borders separated — inputs are darker by default.
+
+       AI AGENT NOTE:
+         Default dividers  → var(--color-border-default)       = #E5E7EB
+         Input resting     → var(--color-border-input-default) = #D1D5DB
+         Input focus       → var(--color-border-input-focus)   = #2066DF  ← ring
+         Active row stripe → neutral; brand stripe removed per interactive policy
+       ========================================================================= */
+
+    /* ── Surface borders ────────────────────────────────────────────────────── */
+    --color-border-default:  var(--ds-border-default);
+    --color-border-hover:    var(--ds-border-hover);
+    --color-border-strong:   var(--ds-border-strong);
+    --color-border-disabled: var(--ds-border-disabled);
+
+    /* ── Input borders ──────────────────────────────────────────────────────── */
+    --color-border-input-default: var(--ds-border-input-default);
+    --color-border-input-hover:   var(--ds-border-input-hover);
+    --color-border-input-focus:   var(--ds-border-input-focus);
+    --color-border-input-disabled:var(--ds-border-input-disabled);
+    --color-border-checkbox:      var(--ds-border-checkbox);
+
+    /* ── Active row stripe ──────────────────────────────────────────────────── */
+    --color-border-row-active: var(--ds-border-row-active);
+
+    /* ── Feedback accent borders ────────────────────────────────────────────── */
+    --color-border-feedback-info:    var(--ds-border-feedback-info);
+    --color-border-feedback-success: var(--ds-border-feedback-success);
+    --color-border-feedback-warning: var(--ds-border-feedback-warning);
+    --color-border-feedback-danger:  var(--ds-border-feedback-danger);
+
+
+    /* =========================================================================
+       05. NAVIGATION
+       #000000 confirmed. Pure black — not asphalt-900.
+
+       AI AGENT NOTE: All nav elements must use these tokens.
+         Sidebar bg       → var(--color-bg-nav) / var(--sidebar) = #000000
+         Nav text         → var(--color-text-nav) / var(--sidebar-foreground)
+         Active item left stripe → nav text color (white), not brand — see .nav-item.active
+         Sidebar shell tokens: --sidebar maps here automatically.
+       ========================================================================= */
+
+    --color-bg-nav:             var(--ds-bg-nav);
+    --color-text-nav:           var(--ds-text-nav);
+    --color-text-nav-muted:     var(--ds-text-nav-muted);
+    --color-bg-nav-item-hover:  var(--ds-bg-nav-item-hover);
+    --color-bg-nav-item-active: var(--ds-bg-nav-item-active);
+    --color-border-nav-active:  var(--ds-border-nav-active);
+
+
+    /* =========================================================================
+       06. BADGES
+       Construction domain status badges. All full-pill shape.
+
+       AI AGENT NOTE: Use `@/components/ui/badge` with variant="outline" and override
+       with these token pairs. Each badge is a bg + text pair.
+         .badge-draft / .badge-bidding  → blue family
+         .badge-construction            → green family
+         .badge-warranty                → purple family
+         .badge-neutral                 → gray family (default)
+         .badge-danger                  → red family
+         .badge-warning                 → amber family
+       ========================================================================= */
+
+    --color-badge-draft-bg:      rgb(219 234 254);   --color-badge-draft-text:    rgb(30 64 175);
+    --color-badge-construct-bg:  rgb(209 250 229);   --color-badge-construct-text:rgb(6 95 70);
+    --color-badge-warranty-bg:   rgb(237 233 254);   --color-badge-warranty-text: rgb(91 33 182);
+    --color-badge-neutral-bg:    rgb(243 244 246);   --color-badge-neutral-text:  rgb(55 65 81);
+    --color-badge-danger-bg:     rgb(254 226 226);   --color-badge-danger-text:   rgb(153 27 27);
+    --color-badge-warning-bg:    rgb(255 251 235);   --color-badge-warning-text:  rgb(146 64 14);
+
+
+    /* =========================================================================
+       07. RADIUS
+       LOCKED — frozen to legacy visual spec.
+       Variable names match Tailwind `@theme` / Untitled UI naming so
+       facades render at legacy values without className changes.
+
+       AI AGENT NOTE: Radius mapping to Tailwind utilities —
+         2px  → rounded-sm  (micro: inner chips)
+         4px  → rounded     (buttons, inputs, dropdowns, tooltips)  ← DEFAULT
+         8px  → rounded-lg  (cards, panels, modals, drawers)
+         pill → rounded-full (badges, tags, avatars)
+
+       Tailwind reads `--radius` (base) and derives sm/md/lg from it.
+       Override here ensures utilities respect legacy 4px/8px spec.
+
+       DO NOT change these values. Legacy spec is 4px buttons, 8px cards.
+       ========================================================================= */
+
+    /* ── Tailwind v4 semantic radius names ─────────────────────────────────── */
+    --radius:      8px;       /* base — rounded-lg maps here                     */
+    --radius-sm:   4px;       /* buttons, inputs, dropdowns  ← PRIMARY default   */
+    --radius-md:   4px;       /* aliases to sm — legacy has no mid-tier          */
+    --radius-lg:   8px;       /* cards, panels, modals                           */
+    --radius-xl:   8px;       /* large containers                                */
+    --radius-2xl:  8px;       /* dialogs — capped at 8px                         */
+    --radius-full: 9999px;    /* badges, pill tags, avatars                      */
+
+    /* ── Untitled UI @theme exact names (UUI reads these) ──────────────────── */
+    --border-radius-sm:   2px;       /* micro — inner chips, tight contexts       */
+    --border-radius-md:   4px;       /* ← UUI reads: buttons, inputs, dropdowns  */
+    --border-radius-lg:   8px;       /* ← UUI reads: cards, panels, modals       */
+    --border-radius-xl:   8px;       /* ← UUI reads: large containers            */
+    --border-radius-2xl:  8px;       /* ← UUI reads: dialogs                     */
+    --border-radius-full: 9999px;    /* ← UUI reads: badges, pill tags           */
+
+
+    /* =========================================================================
+       08. SPACING
+       LOCKED — 8px base unit, frozen to legacy visual spec.
+
+       AI AGENT NOTE: Always use semantic aliases for component composition.
+         --spacing-page-margin  (8px)  → p-2  → outer page wrapper
+         --spacing-card-padding (16px) → p-4  → card/panel inner padding
+         --spacing-inline-gap   (8px)  → gap-2 → icon+label, button+icon
+         --spacing-stack-gap    (12px) → gap-3 → form field vertical rhythm
+         --spacing-section-gap  (32px) → gap-8 → between major page sections
+         --spacing-row-padding-x(12px) → px-3 → table cell horizontal
+         --spacing-row-padding-y(8px)  → py-2 → table cell vertical
+
+       CRITICAL: --spacing must always be 0.25rem (4px).
+       This is Tailwind v4's calc() base. p-4 = calc(4 × 0.25rem) = 1rem = 16px.
+       Changing this breaks ALL Tailwind utility classes.
+       ========================================================================= */
+
+    /* ── Raw scale ──────────────────────────────────────────────────────────── */
+    --space-px:  1px;
+    --space-0:   0px;
+    --space-1:   4px;    /* tight gap — icon + label                             */
+    --space-2:   8px;    /* base unit — page margin ✓                            */
+    --space-3:   12px;   /* stack gap — form field spacing                       */
+    --space-4:   16px;   /* card padding ✓                                       */
+    --space-5:   20px;
+    --space-6:   24px;   /* section gap internal                                 */
+    --space-8:   32px;   /* section gap external                                 */
+    --space-10:  40px;
+    --space-12:  48px;
+    --space-16:  64px;
+
+    /* ── Semantic spacing aliases ───────────────────────────────────────────── */
+    --spacing-page-margin:    16px;  /* outer page gap — 16px all sides ✓        */
+    --spacing-card-padding:   16px;  /* card / panel inner padding ✓             */
+    --spacing-inline-gap:     8px;   /* horizontal gap between elements          */
+    --spacing-stack-gap:      12px;  /* vertical gap between form fields         */
+    --spacing-section-gap:    32px;  /* between major page sections              */
+    --spacing-row-padding-x:  12px;  /* table cell horizontal padding            */
+    --spacing-row-padding-y:  8px;   /* table cell vertical padding              */
+
+    /* ── Base unit — Tailwind v4 multiplier ────────────────────────────────── */
+    /* CRITICAL: --spacing is Tailwind v4's calc base for ALL utility classes.  */
+    /* p-4 = calc(--spacing × 4). NEVER change from 0.25rem.                   */
+    --spacing: 0.25rem;
+
+
+    /* =========================================================================
+       09. COMPONENT HEIGHTS
+       Compact density — legacy app uses 32px inputs and buttons.
+
+       AI AGENT NOTE: Tailwind h-* utility equivalents —
+         32px  →  h-8   (default buttons, default inputs)
+         24px  →  h-6   (small/inline buttons)
+         40px  →  h-10  (large/primary action buttons, rows, tabs)
+         48px  →  h-12  (global nav bar)
+         36px  →  h-9   (table header rows)
+         20px  →  h-5   (status badges)
+       ========================================================================= */
+
+    --height-input:      32px;   /* text inputs, selects    → h-8                */
+    --height-button:     32px;   /* all button variants     → h-8                */
+    --height-button-sm:  24px;   /* small / inline buttons  → h-6                */
+    --height-button-lg:  40px;   /* large / primary action  → h-10               */
+    --height-nav:        48px;   /* global nav bar          → h-12               */
+    --height-row:        40px;   /* table data rows         → h-10               */
+    --height-row-header: 36px;   /* table header rows       → h-9                */
+    --height-tab:        40px;   /* tab bar items           → h-10               */
+    --height-badge:      20px;   /* status badge chips      → h-5                */
+
+
+    /* =========================================================================
+       10. TYPOGRAPHY
+       Inter confirmed ✓. Legacy uses 14px body (not 16px NGX base).
+
+       AI AGENT NOTE: Tailwind utility equivalents —
+         H1 24px/700  →  text-2xl font-bold
+         H2 20px/600  →  text-xl font-semibold
+         H3 16px/600  →  text-base font-semibold
+         H4 14px/600  →  text-sm font-semibold
+         Body 14px/400 → text-sm font-normal    ← THIS IS THE BODY BASE
+         Small 12px/400 → text-xs font-normal
+         Mono 12px    →  text-xs font-mono
+
+       IMPORTANT: Body is 14px (text-sm), NOT 16px (text-base).
+       All paragraph text, table cells, and form labels use text-sm.
+       ========================================================================= */
+
+    --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system,
+                 BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'Geist Mono', ui-monospace, 'Cascadia Code', monospace;
+
+    /* ── Type scale ─────────────────────────────────────────────────────────── */
+    /* H1: page titles */
+    --text-h1-size:   24px;   --text-h1-weight:  700;
+    --text-h1-lh:     32px;   --text-h1-ls:      0.15px;
+
+    /* H2: section headings */
+    --text-h2-size:   20px;   --text-h2-weight:  600;
+    --text-h2-lh:     28px;   --text-h2-ls:      0.15px;
+
+    /* H3: card titles, drawer headers */
+    --text-h3-size:   16px;   --text-h3-weight:  600;
+    --text-h3-lh:     24px;   --text-h3-ls:      0.15px;
+
+    /* H4: sub-section labels */
+    --text-h4-size:   14px;   --text-h4-weight:  600;
+    --text-h4-lh:     20px;   --text-h4-ls:      0.15px;
+
+    /* Body: primary content — 14px (legacy ≠ NGX 16px base) */
+    --text-body-size:  14px;  --text-body-weight: 400;
+    --text-body-lh:    20px;  --text-body-ls:     0.15px;
+
+    /* Small: metadata, timestamps, column headers */
+    --text-sm-size:    12px;  --text-sm-weight:  400;
+    --text-sm-lh:      16px;  --text-sm-ls:      0.25px;
+
+    /* Mono: code, IDs, BIM references */
+    --text-mono-size:  12px;
+
+
+    /* =========================================================================
+       11. ELEVATION
+       Cards/panels use a subtle shadow — no border. Shadows reserved for overlays.
+
+       AI AGENT NOTE:
+         Cards/panels       → shadow-sm (subtle lift — no border)
+         Dropdowns/popovers → shadow-md
+         Modals/dialogs     → shadow-lg
+         Drawers/sheets     → shadow-xl
+         Focus rings        → shadow-focus = 3px blue ring (#2066DF)
+
+       Popover, select, and tooltip surfaces get shadow-md via
+       the presentation overrides in Section 18.
+       ========================================================================= */
+
+    --shadow-none:    none;
+    --shadow-xs:      0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-sm:      0 1px 3px 0 rgb(0 0 0 / 0.08),
+                      0 1px 2px 0 rgb(0 0 0 / 0.04);            /* cards, tiles */
+    --shadow-md:      0 1px 3px 0 rgb(0 0 0 / 0.10),
+                      0 1px 2px 0 rgb(0 0 0 / 0.06);            /* dropdowns    */
+    --shadow-lg:      0 4px 6px -1px rgb(0 0 0 / 0.10),
+                      0 2px 4px -1px rgb(0 0 0 / 0.06);         /* modals       */
+    --shadow-xl:      0 10px 15px -3px rgb(0 0 0 / 0.10),
+                      0 4px 6px -2px rgb(0 0 0 / 0.05);         /* drawers      */
+    --shadow-focus:   0 0 0 3px rgb(32 102 223 / 0.25);         /* #2066DF ✓    */
+
+
+    /* =========================================================================
+       12. DATA VISUALIZATION — CHART PALETTE
+       9-color categorical set. Source: production legacy app screenshot.
+       Sampled March 2026. Positional assignment only — not semantic.
+
+       AI AGENT NOTE: Usage rules —
+         - Assign by series index: chart-1 = first series, chart-2 = second.
+         - NEVER use for status (success/warning/danger) — those have their own tokens.
+         - chart-4 (gold) and chart-6 (earth-brown): use dark text labels, not white.
+         - For area fills: use --color-chart-N-subtle (15% opacity variants).
+         - Tailwind chart tokens: --chart-N aliases are set in Section 13.
+
+       Contrast (white label text on fill):
+         1  burnt-sienna  #B33A00   6.3:1  AA ✓
+         2  forest-green  #2B8A3E   5.9:1  AA ✓
+         3  navy          #162C5C  13.4:1  AAA ✓
+         4  gold          #C8941A   3.5:1  large text only — use DARK label ⚠
+         5  dark-teal     #0A5C46   8.3:1  AAA ✓
+         6  earth-brown   #8C6B55   3.6:1  large text only — use DARK label ⚠
+         7  bright-teal   #1AA8A0   4.5:1  AA ✓
+         8  purple        #7B1870   7.2:1  AAA ✓
+         9  cornflower    #2D6ED4   4.6:1  AA ✓
+       ========================================================================= */
+
+    /* ── Series fills ───────────────────────────────────────────────────────── */
+    --color-chart-1: rgb(179 58 0);      /* #B33A00  burnt sienna               */
+    --color-chart-2: rgb(43 138 62);     /* #2B8A3E  forest green               */
+    --color-chart-3: rgb(22 44 92);      /* #162C5C  navy                       */
+    --color-chart-4: rgb(200 148 26);    /* #C8941A  gold                       */
+    --color-chart-5: rgb(10 92 70);      /* #0A5C46  dark teal                  */
+    --color-chart-6: rgb(140 107 85);    /* #8C6B55  earth brown                */
+    --color-chart-7: rgb(26 168 160);    /* #1AA8A0  bright teal                */
+    --color-chart-8: rgb(123 24 112);    /* #7B1870  purple                     */
+    --color-chart-9: rgb(45 110 212);    /* #2D6ED4  cornflower blue            */
+
+    /* ── Area fills — 15% opacity for area charts and subtle backgrounds ────── */
+    --color-chart-1-subtle: rgb(179 58 0 / 0.15);
+    --color-chart-2-subtle: rgb(43 138 62 / 0.15);
+    --color-chart-3-subtle: rgb(22 44 92 / 0.15);
+    --color-chart-4-subtle: rgb(200 148 26 / 0.15);
+    --color-chart-5-subtle: rgb(10 92 70 / 0.15);
+    --color-chart-6-subtle: rgb(140 107 85 / 0.15);
+    --color-chart-7-subtle: rgb(26 168 160 / 0.15);
+    --color-chart-8-subtle: rgb(123 24 112 / 0.15);
+    --color-chart-9-subtle: rgb(45 110 212 / 0.15);
+
+    /* ── Chart chrome — axes, gridlines, labels, tooltips ───────────────────── */
+    --color-chart-axis:          rgb(209 213 219);   /* #D1D5DB  axis lines      */
+    --color-chart-gridline:      rgb(243 244 246);   /* #F3F4F6  horizontal guides*/
+    --color-chart-label:         rgb(107 114 128);   /* #6B7280  axis labels     */
+    --color-chart-label-bold:    rgb(55 65 81);      /* #374151  value labels    */
+    --color-chart-tooltip-bg:    rgb(17 24 39);      /* #111827  dark tooltip bg */
+    --color-chart-tooltip-fg:    rgb(255 255 255);   /* white    tooltip text    */
+    --color-chart-tooltip-muted: rgb(209 213 219);   /* #D1D5DB  secondary vals  */
+
+
+    /* =========================================================================
+       13. TAILWIND SURFACE BRIDGE (Untitled UI utilities)
+       ───────────────────────────────────────────────────────────────────────
+       Standard Tailwind theme keys (--background, --card, --primary, …) map to
+       NGX legacy --color-* / --ds-*. Untitled + shared utilities (bg-card,
+       border-border, text-muted-foreground, …) resolve through these names.
+
+       Prefer NGX semantic utilities (bg-background-primary) in app routes;
+       keep this block for Design-System alignment and tw-animate defaults.
+       ========================================================================= */
+
+    /* ── Core semantic tokens ───────────────────────────────────────────────── */
+    --background:           var(--color-bg-canvas);        /* #F5F5F5  page bg   */
+    --foreground:           var(--color-text-primary);     /* #111827            */
+
+    /* ── Card ──────────────────────────────────────────────────────────────── */
+    --card:                 var(--color-bg-primary);       /* #FFFFFF            */
+    --card-foreground:      var(--color-text-primary);     /* #111827            */
+
+    /* ── Popover / Dropdown ─────────────────────────────────────────────────── */
+    --popover:              var(--color-bg-overlay);       /* #FFFFFF            */
+    --popover-foreground:   var(--color-text-primary);     /* #111827            */
+
+    /* ── Primary action — brand orange ─────────────────────────────────────── */
+    --primary:              var(--color-brand-500);        /* #FF5200  ✓         */
+    --primary-foreground:   var(--color-text-inverse);     /* #FFFFFF            */
+
+    /* ── Secondary ──────────────────────────────────────────────────────────── */
+    --secondary:            var(--color-bg-tertiary);      /* #F3F4F6            */
+    --secondary-foreground: var(--color-text-primary);     /* #111827            */
+
+    /* ── Muted ──────────────────────────────────────────────────────────────── */
+    --muted:                var(--color-bg-tertiary);      /* #F3F4F6            */
+    --muted-foreground:     var(--color-text-tertiary);    /* #6B7280            */
+
+    /* ── Accent (hover highlight) ───────────────────────────────────────────── */
+    --accent:               var(--color-bg-secondary);     /* #F8F9FA            */
+    --accent-foreground:    var(--color-text-primary);     /* #111827            */
+
+    /* ── Destructive ────────────────────────────────────────────────────────── */
+    --destructive:          var(--ds-destructive);
+    --destructive-foreground: var(--ds-destructive-foreground);
+
+    /* ── Border + Input + Ring ──────────────────────────────────────────────── */
+    --border:               var(--color-border-default);        /* #E5E7EB       */
+    --input:                var(--color-border-input-default);  /* #D1D5DB       */
+    --ring:                 var(--color-border-input-focus);    /* #2066DF  ✓    */
+
+    /* ── App sidebar (tool rail) ───────────────────────────────────────────── */
+    --sidebar:                    var(--color-bg-nav);           /* #000000  ✓   */
+    --sidebar-foreground:         var(--color-text-nav);         /* #FFFFFF      */
+    --sidebar-accent:             var(--color-bg-nav-item-active); /* #333333    */
+    --sidebar-accent-foreground:  var(--color-text-nav);         /* #FFFFFF      */
+    --sidebar-border:             rgb(51 51 51);                 /* #333333      */
+    --sidebar-ring:               var(--color-border-input-focus);/* #2066DF     */
+    --sidebar-primary:            var(--color-brand-500);        /* #FF5200      */
+    --sidebar-primary-foreground: var(--color-text-inverse);     /* #FFFFFF      */
+
+    /* ── Charts (Recharts / dashboard) ───────────────────────────────────── */
+    /* Chart series read --chart-N (numeric suffix)                             */
+    --chart-1: var(--color-chart-1);
+    --chart-2: var(--color-chart-2);
+    --chart-3: var(--color-chart-3);
+    --chart-4: var(--color-chart-4);
+    --chart-5: var(--color-chart-5);
+    --chart-6: var(--color-chart-6);
+    --chart-7: var(--color-chart-7);
+    --chart-8: var(--color-chart-8);
+    --chart-9: var(--color-chart-9);
+
+    /* ── Untitled UI bridge (legacy) — belt-and-suspenders ─────────────────── */
+    /* Radius overrides duplicated — ensures override wins in every cascade     */
+    --border-radius-sm:   2px;
+    --border-radius-md:   4px;
+    --border-radius-lg:   8px;
+    --border-radius-xl:   8px;
+    --border-radius-2xl:  8px;
+    --border-radius-full: 9999px;
+
+    /* Spacing multiplier — duplicated for cascade safety ───────────────────── */
+    --spacing: 0.25rem;
+
+  } /* end tokens */
+
+  /* =========================================================================
+     21. APP DARK MODE — values authored in ngx-canonical-tokens.css (`--ds-*`).
+     `--color-*` aliases resolve to `var(--ds-*)`; surface bridge (§13) uses
+     `--color-*`, so light/dark tracks ngx-canonical-tokens + html.dark / .dark-mode.
+     ========================================================================= */
+} /* end @layer base */
+
+
+/* ============================================================================
+   14. REACT ARIA / ROLE HOOKS (Untitled UI shell)
+   ─────────────────────────────────────────────────────────────────────────────
+   Legacy chrome for RAC menus, dialogs, tabs, and ARIA roles. No Radix selectors.
+
+   Covers: listbox/popover surfaces, data-highlighted rows, form controls by role,
+   accordion data-slot pattern, modal overlay, focus ring.
+   ============================================================================ */
+
+/* ── Listbox / overlay panels (RAC Popover, Select listbox) ──────────────── */
+[data-theme="legacy"] [role="listbox"] {
+  background:    var(--color-bg-overlay);
+  border:        1px solid var(--color-border-default);
+  border-radius: var(--border-radius-lg);
+  box-shadow:    var(--shadow-md);
+  font-family:   var(--font-sans);
+  font-size:     var(--text-body-size);
+  color:         var(--color-text-primary);
+}
+
+/* ── Menu row highlight (RAC) ─────────────────────────────────────────────── */
+[data-theme="legacy"] [data-highlighted],
+[data-theme="legacy"] [role="option"][data-highlighted] {
+  background: var(--color-bg-secondary);
+  color:      var(--color-text-primary);
+  outline:    none;
+  cursor:     pointer;
+}
+
+/* ── Disabled items ─────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [data-disabled] {
+  color:          var(--color-text-disabled);
+  pointer-events: none;
+  cursor:         not-allowed;
+}
+
+/* ── Select placeholder ───────────────────────────────────────────────────── */
+[data-theme="legacy"] [data-placeholder] {
+  color: var(--color-text-placeholder);
+}
+
+/* ── Checkbox (role) — Radix / patterns with data-state (not Untitled RAC indicator) ─ */
+[data-theme="legacy"] [role="checkbox"][data-state="unchecked"] {
+  background:    var(--color-bg-primary);
+  border:        1px solid var(--color-border-checkbox);
+  border-radius: 2px;
+  box-shadow:    none;
+}
+[data-theme="legacy"] [role="checkbox"][data-state="checked"] {
+  background:    var(--color-text-primary);
+  border-color:  var(--color-text-primary);
+  color:         var(--color-text-inverse);
+}
+
+/* ── Radio (role) ─────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [role="radio"][data-state="unchecked"] {
+  background:  var(--color-bg-primary);
+  border:      1px solid var(--color-border-input-default);
+}
+[data-theme="legacy"] [role="radio"][data-state="checked"] {
+  background:  var(--color-bg-primary);
+  border:      1px solid var(--color-text-primary);
+}
+[data-theme="legacy"] [role="radio"][data-state="checked"]::after {
+  background: var(--color-text-primary);
+}
+
+/* ── Switch (role) — RAC uses `data-selected`; track chrome is on the inner pill ─ */
+[data-theme="legacy"] [role="switch"] {
+  background-color: transparent !important;
+}
+
+/* ── Tooltip (role) ─────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [role="tooltip"] {
+  background:    var(--color-chart-tooltip-bg);
+  color:         var(--color-chart-tooltip-fg);
+  border-radius: var(--border-radius-md);
+  font-size:     var(--text-sm-size);
+  box-shadow:    var(--shadow-md);
+  padding:       var(--space-2) var(--space-3);
+}
+
+/* ── Modal overlay (RAC ModalOverlay) ─────────────────────────────────────── */
+[data-theme="legacy"] [data-overlay] {
+  background: rgb(0 0 0 / 0.50);
+}
+
+/* ── Dialog surface ───────────────────────────────────────────────────────── */
+[data-theme="legacy"] [role="dialog"] {
+  background:    var(--color-bg-overlay);
+  border:        1px solid var(--color-border-default);
+  border-radius: var(--border-radius-lg);
+  box-shadow:    var(--shadow-xl);
+  font-family:   var(--font-sans);
+}
+
+/* ── Tabs (role) ───────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [role="tablist"] {
+  border-bottom: 1px solid var(--color-border-default);
+}
+[data-theme="legacy"] [role="tab"] {
+  font-family:  var(--font-sans);
+  font-size:    var(--text-body-size);
+  font-weight:  500;
+  color:        var(--color-text-secondary);
+  height:       var(--height-tab);
+  border-bottom:2px solid transparent;
+  transition:   color 150ms ease, border-color 150ms ease;
+}
+[data-theme="legacy"] [role="tab"][data-state="active"] {
+  color:        var(--color-text-primary);
+  border-bottom-color: var(--color-text-primary);
+}
+[data-theme="legacy"] [role="tab"]:hover:not([data-state="active"]) {
+  color:      var(--color-text-primary);
+  background: var(--color-bg-secondary);
+}
+
+/* ── Accordion (RAC Disclosure — data-slot from components/ui/accordion) ──── */
+[data-theme="legacy"] [data-slot="accordion-item"] {
+  border-bottom: 1px solid var(--color-border-default);
+}
+[data-theme="legacy"] [data-slot="accordion-trigger"] {
+  font-family:  var(--font-sans);
+  font-size:    var(--text-body-size);
+  font-weight:  500;
+  color:        var(--color-text-primary);
+}
+[data-theme="legacy"] [data-slot="accordion-trigger"][data-expanded="true"] {
+  color: var(--color-text-primary);
+}
+
+/* ── Separator ─────────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [role="separator"] {
+  background: var(--color-border-default);
+}
+
+/* ── Scroll area (app data-slot) ───────────────────────────────────────────── */
+[data-theme="legacy"] [data-slot="scroll-area-scrollbar"] {
+  background: transparent;
+}
+[data-theme="legacy"] [data-slot="scroll-area-viewport"]::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--border-radius-full);
+}
+
+/* ── Slider (role + track fill) ────────────────────────────────────────────── */
+[data-theme="legacy"] [role="slider"] {
+  background: var(--color-text-primary);
+  border:     2px solid var(--color-bg-primary);
+  box-shadow: var(--shadow-xs);
+}
+
+/* ── Progress (role) ───────────────────────────────────────────────────────── */
+[data-theme="legacy"] [role="progressbar"] {
+  background: var(--color-bg-tertiary);
+  border-radius: var(--border-radius-full);
+}
+
+/* ── Toast / alert ─────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [role="alert"][data-state="open"] {
+  background:    var(--color-bg-overlay);
+  border:        1px solid var(--color-border-default);
+  border-radius: var(--border-radius-lg);
+  box-shadow:    var(--shadow-xl);
+  font-family:   var(--font-sans);
+}
+
+/* ── Universal focus ring override ─────────────────────────────────────────── */
+/* Ensures consistent #2066DF ring on interactive elements (RAC + native) */
+[data-theme="legacy"] *:focus-visible {
+  outline:      none;
+  box-shadow:   var(--shadow-focus);           /* 3px #2066DF/25% ring ✓       */
+}
+
+
+/* ============================================================================
+   15. TAILWIND v4 @THEME OVERRIDES
+   ─────────────────────────────────────────────────────────────────────────────
+   Registers legacy values as Tailwind design tokens. Tailwind v4's CSS-first
+   @theme system makes these available as utility classes throughout the build.
+
+   AI AGENT NOTE: These values become available as Tailwind utility classes.
+     --color-brand-500 → bg-brand-500, text-brand-500, border-brand-500
+     --radius-sm       → rounded-sm (buttons, inputs)
+     --radius-lg       → rounded-lg (cards, panels)
+     --font-sans       → font-sans
+     --font-mono       → font-mono
+
+   IMPORTANT: Only declare @theme values here if they need to be Tailwind
+   utilities. Token-only values (hover states, etc.) live in @layer base above.
+   ============================================================================ */
+
+@theme {
+  /* ── Colors ─────────────────────────────────────────────────────────────── */
+  --color-brand-25:  rgb(255 244 240);
+  --color-brand-50:  rgb(255 236 228);
+  --color-brand-100: rgb(255 213 194);
+  --color-brand-200: rgb(255 180 153);
+  --color-brand-300: rgb(255 138 92);
+  --color-brand-400: rgb(255 107 47);
+  --color-brand-500: rgb(255 82 0);
+  --color-brand-600: rgb(230 73 0);
+  --color-brand-700: rgb(204 63 0);
+  --color-brand-800: rgb(158 49 0);
+  --color-brand-900: rgb(116 36 0);
+  --color-brand-950: rgb(72 22 0);
+
+  /* ── Fonts ───────────────────────────────────────────────────────────────── */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system,
+               BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'Cascadia Code', monospace;
+
+  /* ── Border radius ───────────────────────────────────────────────────────── */
+  --radius:      8px;
+  --radius-sm:   4px;
+  --radius-md:   4px;
+  --radius-lg:   8px;
+  --radius-xl:   8px;
+  --radius-2xl:  8px;
+  --radius-full: 9999px;
+
+  /* ── Spacing multiplier — NEVER change ───────────────────────────────────── */
+  --spacing: 0.25rem;
+}
+
+
+/* ============================================================================
+   16. ELEMENT STYLES — Typography + base HTML
+   ============================================================================ */
+
+[data-theme="legacy"] body {
+  font-family:            var(--font-sans);
+  font-size:              var(--text-body-size);   /* 14px — not 16px */
+  font-weight:            var(--text-body-weight);
+  line-height:            var(--text-body-lh);
+  color:                  var(--color-text-primary);
+  background:             var(--color-bg-canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[data-theme="legacy"] h1 { font-family: var(--font-sans); font-size: var(--text-h1-size); font-weight: var(--text-h1-weight); line-height: var(--text-h1-lh); letter-spacing: var(--text-h1-ls); color: var(--color-text-primary); }
+[data-theme="legacy"] h2 { font-family: var(--font-sans); font-size: var(--text-h2-size); font-weight: var(--text-h2-weight); line-height: var(--text-h2-lh); letter-spacing: var(--text-h2-ls); color: var(--color-text-primary); }
+[data-theme="legacy"] h3 { font-family: var(--font-sans); font-size: var(--text-h3-size); font-weight: var(--text-h3-weight); line-height: var(--text-h3-lh); letter-spacing: var(--text-h3-ls); color: var(--color-text-primary); }
+[data-theme="legacy"] h4 { font-family: var(--font-sans); font-size: var(--text-h4-size); font-weight: var(--text-h4-weight); line-height: var(--text-h4-lh); letter-spacing: var(--text-h4-ls); color: var(--color-text-primary); }
+[data-theme="legacy"] p  { font-family: var(--font-sans); font-size: var(--text-body-size); font-weight: var(--text-body-weight); line-height: var(--text-body-lh); color: var(--color-text-primary); }
+[data-theme="legacy"] small { font-family: var(--font-sans); font-size: var(--text-sm-size); line-height: var(--text-sm-lh); color: var(--color-text-secondary); }
+[data-theme="legacy"] label { font-family: var(--font-sans); font-size: var(--text-body-size); font-weight: 500; line-height: var(--text-body-lh); color: var(--color-text-secondary); }
+[data-theme="legacy"] code,
+[data-theme="legacy"] pre  { font-family: var(--font-mono); font-size: var(--text-mono-size); }
+
+[data-theme="legacy"] a {
+  color:                    var(--color-text-link);     /* #1D5CC9 ✓ */
+  text-decoration:          underline;
+  text-underline-offset:    2px;
+  text-decoration-thickness:1px;
+}
+[data-theme="legacy"] a:hover         { color: var(--color-text-link-hover); }
+[data-theme="legacy"] a:focus-visible {
+  outline:       none;
+  border-radius: var(--border-radius-sm);
+  box-shadow:    var(--shadow-focus);
+}
+
+
+/* ============================================================================
+   17. COMPONENT STYLES
+   ─────────────────────────────────────────────────────────────────────────────
+   AI AGENT NOTE: Prefer @/components/ui/button (Untitled + [data-slot="button"]).
+   For buttons, use variant/size props — not legacy class names. Rules below for
+   .btn-* exist only for backward compatibility with old static markup; do not
+   use .btn-primary / .btn-secondary / .btn-ghost / .btn-danger in new work.
+
+   Card variants:      .card  .panel  .card-header
+   Layout:             .page-container  .section-gap
+   Badges:             .badge + modifier (.badge-draft, .badge-construction, etc.)
+   Banners:            .banner + modifier (.banner-info, .banner-success, etc.)
+   Navigation:         .nav-surface  .nav-item  (+.active class for active state)
+   Tables:             native <table> elements are styled automatically
+   Charts:             .chart-container  .chart-series-N  .chart-area-N  .chart-stroke-N
+   ============================================================================ */
+
+/* ── Layout ─────────────────────────────────────────────────────────────────── */
+
+[data-theme="legacy"] .page-container {
+  padding:    var(--spacing-page-margin);    /* 8px ✓ */
+  background: var(--color-bg-canvas);
+}
+
+[data-theme="legacy"] .section-gap {
+  margin-bottom: var(--spacing-section-gap); /* 32px */
+}
+
+/* ── Cards ──────────────────────────────────────────────────────────────────── */
+
+[data-theme="legacy"] .card,
+[data-theme="legacy"] .panel {
+  background:    var(--color-bg-primary);
+  border-radius: var(--border-radius-lg);     /* 8px ✓ */
+  padding:       var(--spacing-card-padding); /* 16px ✓ */
+  box-shadow:    var(--shadow-sm);            /* subtle lift */
+}
+
+[data-theme="legacy"] .card-header {
+  padding-bottom: var(--space-3);             /* 12px */
+  margin-bottom:  var(--space-3);             /* 12px */
+  border-bottom:  1px solid var(--color-border-default);
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────────── */
+
+[data-theme="legacy"] .btn-primary {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             var(--space-2);           /* 8px icon gap */
+  height:          var(--height-button);    /* 32px ✓ */
+  padding:         0 var(--space-4);        /* 0 16px */
+  background:      var(--color-brand-500);  /* #FF5200 ✓ */
+  color:           var(--color-text-inverse);
+  border:          none;
+  border-radius:   var(--border-radius-md); /* 4px ✓ */
+  font-family:     var(--font-sans);
+  font-size:       var(--text-body-size);
+  font-weight:     600;
+  letter-spacing:  var(--text-body-ls);
+  cursor:          pointer;
+  transition:      background 150ms ease;
+  user-select:     none;
+}
+[data-theme="legacy"] .btn-primary:hover         { background: var(--color-brand-600); }  /* #E64900 ✓ */
+[data-theme="legacy"] .btn-primary:active        { background: var(--color-brand-700); }
+[data-theme="legacy"] .btn-primary:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+[data-theme="legacy"] .btn-primary:disabled,
+[data-theme="legacy"] .btn-primary[disabled]     { background: var(--color-bg-tertiary); color: var(--color-text-disabled); cursor: not-allowed; pointer-events: none; }
+
+[data-theme="legacy"] .btn-secondary {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             var(--space-2);
+  height:          var(--height-button);    /* 32px ✓ */
+  padding:         0 var(--space-4);
+  background:      var(--color-bg-btn-secondary);   /* #EEF0F1 ✓ */
+  color:           var(--color-text-primary);
+  border:          none;
+  border-radius:   var(--border-radius-md); /* 4px ✓ */
+  font-family:     var(--font-sans);
+  font-size:       var(--text-body-size);
+  font-weight:     500;
+  letter-spacing:  var(--text-body-ls);
+  cursor:          pointer;
+  transition:      background 150ms ease;
+  user-select:     none;
+}
+[data-theme="legacy"] .btn-secondary:hover         { background: var(--color-bg-btn-secondary-hover); }
+[data-theme="legacy"] .btn-secondary:active        { background: var(--color-bg-btn-secondary-active); }
+[data-theme="legacy"] .btn-secondary:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+[data-theme="legacy"] .btn-secondary:disabled,
+[data-theme="legacy"] .btn-secondary[disabled]     { background: var(--color-bg-btn-secondary-disabled); color: var(--color-text-disabled); cursor: not-allowed; pointer-events: none; }
+
+[data-theme="legacy"] .btn-ghost {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             var(--space-2);
+  height:          var(--height-button);
+  padding:         0 var(--space-3);
+  background:      transparent;
+  color:           var(--color-text-secondary);
+  border:          none;
+  border-radius:   var(--border-radius-md);
+  font-family:     var(--font-sans);
+  font-size:       var(--text-body-size);
+  font-weight:     500;
+  cursor:          pointer;
+  transition:      background 150ms ease, color 150ms ease;
+  user-select:     none;
+}
+[data-theme="legacy"] .btn-ghost:hover { background: var(--color-bg-secondary); color: var(--color-text-primary); }
+
+[data-theme="legacy"] .btn-danger {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             var(--space-2);
+  height:          var(--height-button);
+  padding:         0 var(--space-4);
+  background:      var(--destructive);      /* #DC2626 */
+  color:           var(--color-text-inverse);
+  border:          none;
+  border-radius:   var(--border-radius-md); /* 4px ✓ */
+  font-family:     var(--font-sans);
+  font-size:       var(--text-body-size);
+  font-weight:     600;
+  cursor:          pointer;
+  transition:      background 150ms ease;
+  user-select:     none;
+}
+[data-theme="legacy"] .btn-danger:hover { background: rgb(185 28 28); }
+[data-theme="legacy"] .btn-danger:focus-visible { outline: none; box-shadow: 0 0 0 3px rgb(220 38 38 / 0.25); }
+
+/* ── Inputs ───────────────────────────��─────────────���────────────���──────────── */
+
+[data-theme="legacy"] input[type="text"],
+[data-theme="legacy"] input[type="search"],
+[data-theme="legacy"] input[type="email"],
+[data-theme="legacy"] input[type="number"],
+[data-theme="legacy"] input[type="password"],
+[data-theme="legacy"] input[type="url"],
+[data-theme="legacy"] input[type="tel"],
+[data-theme="legacy"] select,
+[data-theme="legacy"] textarea {
+  display:        block;
+  width:          100%;
+  height:         var(--height-input);               /* 32px ✓ */
+  padding:        0 var(--space-3);                  /* 0 12px */
+  background:     var(--color-bg-primary);
+  color:          var(--color-text-primary);
+  border:         1px solid var(--color-border-input-default);
+  border-radius:  var(--border-radius-md);            /* 4px ✓ */
+  font-family:    var(--font-sans);
+  font-size:      var(--text-body-size);
+  font-weight:    var(--text-body-weight);
+  letter-spacing: var(--text-body-ls);
+  transition:     border-color 150ms ease, box-shadow 150ms ease;
+}
+[data-theme="legacy"] textarea {
+  height:  auto;
+  padding: var(--space-2) var(--space-3);
+  resize:  vertical;
+}
+[data-theme="legacy"] input:hover,
+[data-theme="legacy"] select:hover,
+[data-theme="legacy"] textarea:hover  { border-color: var(--color-border-input-hover); }
+[data-theme="legacy"] input:focus,
+[data-theme="legacy"] select:focus,
+[data-theme="legacy"] textarea:focus  {
+  outline:      none;
+  border-color: var(--color-border-input-focus); /* #2066DF ✓ */
+  box-shadow:   var(--shadow-focus);
+}
+[data-theme="legacy"] input:disabled,
+[data-theme="legacy"] select:disabled,
+[data-theme="legacy"] textarea:disabled {
+  background:     var(--color-bg-disabled);
+  color:          var(--color-text-disabled);
+  border-color:   var(--color-border-input-disabled);
+  cursor:         not-allowed;
+}
+[data-theme="legacy"] input::placeholder,
+[data-theme="legacy"] textarea::placeholder { color: var(--color-text-placeholder); }
+
+/* ── Table ──────────────────────────────────────────────────────────────────── */
+
+[data-theme="legacy"] table  { border-collapse: collapse; width: 100%; }
+
+[data-theme="legacy"] thead tr {
+  background:    var(--color-bg-primary);
+  border-bottom: 1px solid var(--color-border-default);
+}
+[data-theme="legacy"] thead th {
+  padding:        var(--spacing-row-padding-y) var(--spacing-row-padding-x);
+  font-family:    var(--font-sans);
+  font-size:      var(--text-sm-size);
+  font-weight:    600;
+  color:          var(--color-text-secondary);
+  letter-spacing: var(--text-sm-ls);
+  text-align:     left;
+  white-space:    nowrap;
+}
+[data-theme="legacy"] tbody tr {
+  background:  var(--color-bg-primary);
+  border-bottom: 1px solid var(--color-border-default);
+  transition:  background 100ms ease;
+}
+[data-theme="legacy"] tbody tr:hover { background: var(--color-bg-secondary); }
+[data-theme="legacy"] tbody tr.active,
+[data-theme="legacy"] tbody tr[data-active="true"] {
+  background:  var(--color-bg-secondary);
+  border-left: 3px solid var(--color-text-primary);
+}
+[data-theme="legacy"] tbody td {
+  padding:        var(--spacing-row-padding-y) var(--spacing-row-padding-x);
+  font-family:    var(--font-sans);
+  font-size:      var(--text-body-size);
+  line-height:    var(--text-body-lh);
+  letter-spacing: var(--text-body-ls);
+  color:          var(--color-text-primary);
+}
+
+/* ── Badges ─────────────────────────────────────────────────────────────────── */
+
+[data-theme="legacy"] .badge {
+  display:        inline-flex;
+  align-items:    center;
+  height:         var(--height-badge);      /* 20px */
+  padding:        0 var(--space-3);         /* 0 12px */
+  border-radius:  var(--border-radius-full);/* pill ✓ */
+  font-family:    var(--font-sans);
+  font-size:      var(--text-sm-size);
+  font-weight:    500;
+  line-height:    1;
+  letter-spacing: var(--text-sm-ls);
+  white-space:    nowrap;
+}
+[data-theme="legacy"] .badge-draft,
+[data-theme="legacy"] .badge-bidding      { background: var(--color-badge-draft-bg);    color: var(--color-badge-draft-text); }
+[data-theme="legacy"] .badge-construction { background: var(--color-badge-construct-bg); color: var(--color-badge-construct-text); }
+[data-theme="legacy"] .badge-warranty     { background: var(--color-badge-warranty-bg);  color: var(--color-badge-warranty-text); }
+[data-theme="legacy"] .badge-neutral      { background: var(--color-badge-neutral-bg);   color: var(--color-badge-neutral-text); }
+[data-theme="legacy"] .badge-danger       { background: var(--color-badge-danger-bg);    color: var(--color-badge-danger-text); }
+[data-theme="legacy"] .badge-warning      { background: var(--color-badge-warning-bg);   color: var(--color-badge-warning-text); }
+
+/* ── Feedback banners ───────────────────────────────────────────────────────── */
+
+[data-theme="legacy"] .banner {
+  display:       flex;
+  align-items:   flex-start;
+  gap:           var(--space-3);
+  padding:       var(--space-3) var(--space-4);  /* 12px 16px */
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  border-left:   4px solid;
+  font-family:   var(--font-sans);
+  font-size:     var(--text-body-size);
+}
+[data-theme="legacy"] .banner-info    { background: var(--color-bg-feedback-info);    border-color: var(--color-border-feedback-info);    color: var(--color-text-info); }
+[data-theme="legacy"] .banner-success { background: var(--color-bg-feedback-success); border-color: var(--color-border-feedback-success); color: var(--color-text-success); }
+[data-theme="legacy"] .banner-warning { background: var(--color-bg-feedback-warning); border-color: var(--color-border-feedback-warning); color: var(--color-text-warning); }
+[data-theme="legacy"] .banner-danger  { background: var(--color-bg-feedback-danger);  border-color: var(--color-border-feedback-danger);  color: var(--color-text-danger); }
+
+
+/* ── Navigation ─────────────────────────────────────────────────────────────── */
+
+[data-theme="legacy"] .nav-surface {
+  background: var(--color-bg-nav);          /* #000000 ✓ */
+  color:      var(--color-text-nav);
+}
+[data-theme="legacy"] .nav-item {
+  display:       flex;
+  align-items:   center;
+  gap:           var(--space-3);
+  padding:       var(--space-3) var(--space-4);
+  color:         var(--color-text-nav-muted);
+  font-family:   var(--font-sans);
+  font-size:     var(--text-body-size);
+  cursor:        pointer;
+  transition:    background 100ms ease;
+  border-left:   3px solid transparent;
+  user-select:   none;
+}
+[data-theme="legacy"] .nav-item:hover  { background: var(--color-bg-nav-item-hover); color: var(--color-text-nav); }
+[data-theme="legacy"] .nav-item.active { background: var(--color-bg-nav-item-active); color: var(--color-text-nav); border-left-color: var(--color-text-nav); }
+
+
+/* ============================================================================
+   18. APP SHELL / UNTITLED PRESENTATION OVERRIDES
+   ─────────────────────────────────────────────────────────────────────────────
+   Ensures shared class patterns (buttons, cards, inputs, selects) pick up legacy
+   typography and radii within [data-theme="legacy"].
+
+   Prefer @/components/ui/* (Untitled + RAC facades) in application code.
+   ============================================================================ */
+
+/* ── Buttons (flex row triggers) ──────────────────────────────────────────── */
+[data-theme="legacy"] .btn,
+[data-theme="legacy"] button[class*="inline-flex"][class*="items-center"] {
+  font-family: var(--font-sans);
+  font-size:   var(--text-body-size);
+}
+
+/* ── Rounded containers ───────────────────────────────────────────────────── */
+[data-theme="legacy"] [class*="rounded-xl"] { border-radius: var(--border-radius-lg) !important; }
+[data-theme="legacy"] [class*="rounded-2xl"] { border-radius: var(--border-radius-lg) !important; }
+
+/* ── Compact flex rows (inputs / triggers) ─────────────────────────────────── */
+[data-theme="legacy"] [class*="flex"][class*="h-9"],
+[data-theme="legacy"] [class*="flex"][class*="h-10"] {
+  /* Let height tokens control via CSS variables above */
+  font-family: var(--font-sans);
+  font-size:   var(--text-body-size);
+}
+
+/* ── Full-screen modal scrim ───────────────────────────────────────────────── */
+[data-theme="legacy"] [class*="fixed"][class*="inset-0"][class*="bg-black"] {
+  background-color: rgb(0 0 0 / 0.50);
+}
+
+/* ── Pills / badges ─────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [class*="badge"],
+[data-theme="legacy"] [class*="inline-flex"][class*="rounded-full"] {
+  font-family:   var(--font-sans);
+  font-size:     var(--text-sm-size);
+  border-radius: var(--border-radius-full);
+}
+
+/* ── Select trigger (RAC / class substring) ───────────────────────────────── */
+[data-theme="legacy"] [class*="SelectTrigger"],
+[data-theme="legacy"] button[data-slot="select-trigger"] {
+  box-sizing:    border-box;
+  width:         100%;
+  max-width:     100%;
+  min-width:     min(100%, 12rem);
+  height:        var(--height-input);
+  font-family:   var(--font-sans);
+  font-size:     var(--text-body-size);
+  border-radius: var(--border-radius-md);
+  border-color:  var(--color-border-input-default);
+  transition:    border-color 150ms ease, box-shadow 150ms ease;
+}
+[data-theme="legacy"] button[data-slot="select-trigger"]:hover:not([data-disabled]) {
+  border-color: var(--color-border-input-hover) !important;
+}
+[data-theme="legacy"] button[data-slot="select-trigger"]:focus-visible {
+  border-color: var(--color-border-input-focus);
+  box-shadow:   var(--shadow-focus);
+}
+
+
+/* ============================================================================
+   19. DATA VISUALIZATION — COMPONENT UTILITIES
+   Class-based API for chart series, tooltips, legend, and chrome.
+
+   AI AGENT NOTE: Apply these classes to chart wrapper elements.
+   Use series classes (.chart-series-N) on SVG paths and HTML elements.
+   chart-4 and chart-6 require dark text labels — see Section 12 note.
+   ============================================================================ */
+
+/* ── Series fills (SVG + HTML) ──────────────────────────────────────────────── */
+[data-theme="legacy"] .chart-series-1 { fill: var(--color-chart-1); background-color: var(--color-chart-1); }
+[data-theme="legacy"] .chart-series-2 { fill: var(--color-chart-2); background-color: var(--color-chart-2); }
+[data-theme="legacy"] .chart-series-3 { fill: var(--color-chart-3); background-color: var(--color-chart-3); }
+[data-theme="legacy"] .chart-series-4 { fill: var(--color-chart-4); background-color: var(--color-chart-4); }
+[data-theme="legacy"] .chart-series-5 { fill: var(--color-chart-5); background-color: var(--color-chart-5); }
+[data-theme="legacy"] .chart-series-6 { fill: var(--color-chart-6); background-color: var(--color-chart-6); }
+[data-theme="legacy"] .chart-series-7 { fill: var(--color-chart-7); background-color: var(--color-chart-7); }
+[data-theme="legacy"] .chart-series-8 { fill: var(--color-chart-8); background-color: var(--color-chart-8); }
+[data-theme="legacy"] .chart-series-9 { fill: var(--color-chart-9); background-color: var(--color-chart-9); }
+
+/* ── Area fills — semi-transparent ─────────────────────────────────────────── */
+[data-theme="legacy"] .chart-area-1 { fill: var(--color-chart-1-subtle); background-color: var(--color-chart-1-subtle); }
+[data-theme="legacy"] .chart-area-2 { fill: var(--color-chart-2-subtle); background-color: var(--color-chart-2-subtle); }
+[data-theme="legacy"] .chart-area-3 { fill: var(--color-chart-3-subtle); background-color: var(--color-chart-3-subtle); }
+[data-theme="legacy"] .chart-area-4 { fill: var(--color-chart-4-subtle); background-color: var(--color-chart-4-subtle); }
+[data-theme="legacy"] .chart-area-5 { fill: var(--color-chart-5-subtle); background-color: var(--color-chart-5-subtle); }
+[data-theme="legacy"] .chart-area-6 { fill: var(--color-chart-6-subtle); background-color: var(--color-chart-6-subtle); }
+[data-theme="legacy"] .chart-area-7 { fill: var(--color-chart-7-subtle); background-color: var(--color-chart-7-subtle); }
+[data-theme="legacy"] .chart-area-8 { fill: var(--color-chart-8-subtle); background-color: var(--color-chart-8-subtle); }
+[data-theme="legacy"] .chart-area-9 { fill: var(--color-chart-9-subtle); background-color: var(--color-chart-9-subtle); }
+
+/* ── Strokes (SVG lines + HTML borders) ─────────────────────────────────────── */
+[data-theme="legacy"] .chart-stroke-1 { stroke: var(--color-chart-1); border-color: var(--color-chart-1); }
+[data-theme="legacy"] .chart-stroke-2 { stroke: var(--color-chart-2); border-color: var(--color-chart-2); }
+[data-theme="legacy"] .chart-stroke-3 { stroke: var(--color-chart-3); border-color: var(--color-chart-3); }
+[data-theme="legacy"] .chart-stroke-4 { stroke: var(--color-chart-4); border-color: var(--color-chart-4); }
+[data-theme="legacy"] .chart-stroke-5 { stroke: var(--color-chart-5); border-color: var(--color-chart-5); }
+[data-theme="legacy"] .chart-stroke-6 { stroke: var(--color-chart-6); border-color: var(--color-chart-6); }
+[data-theme="legacy"] .chart-stroke-7 { stroke: var(--color-chart-7); border-color: var(--color-chart-7); }
+[data-theme="legacy"] .chart-stroke-8 { stroke: var(--color-chart-8); border-color: var(--color-chart-8); }
+[data-theme="legacy"] .chart-stroke-9 { stroke: var(--color-chart-9); border-color: var(--color-chart-9); }
+
+/* ── Chart container ────────────────────────────────────────────────────────── */
+[data-theme="legacy"] .chart-container {
+  background:    var(--color-bg-primary);
+  border:        1px solid var(--color-border-default);
+  border-radius: var(--border-radius-lg);           /* 8px ✓ */
+  padding:       var(--spacing-card-padding);        /* 16px ✓ */
+}
+[data-theme="legacy"] .chart-title {
+  font-family:    var(--font-sans);
+  font-size:      var(--text-h3-size);
+  font-weight:    var(--text-h3-weight);
+  color:          var(--color-text-primary);
+  letter-spacing: var(--text-h3-ls);
+  margin-bottom:  var(--space-1);
+}
+[data-theme="legacy"] .chart-subtitle {
+  font-family:    var(--font-sans);
+  font-size:      var(--text-sm-size);
+  color:          var(--color-text-tertiary);
+  letter-spacing: var(--text-sm-ls);
+  margin-bottom:  var(--space-4);
+}
+
+/* ── Tooltip ────────────────────────────────────────────────────────────────── */
+[data-theme="legacy"] .chart-tooltip {
+  background:    var(--color-chart-tooltip-bg);     /* #111827 dark */
+  color:         var(--color-chart-tooltip-fg);     /* white */
+  border-radius: var(--border-radius-md);           /* 4px ✓ */
+  padding:       var(--space-2) var(--space-3);     /* 8px 12px */
+  font-family:   var(--font-sans);
+  font-size:     var(--text-sm-size);               /* 12px */
+  box-shadow:    var(--shadow-md);
+  pointer-events:none;
+  min-width:     120px;
+}
+[data-theme="legacy"] .chart-tooltip-label { font-size: var(--text-sm-size); font-weight: 600; color: var(--color-chart-tooltip-fg); margin-bottom: var(--space-1); }
+[data-theme="legacy"] .chart-tooltip-value { font-size: var(--text-sm-size); color: var(--color-chart-tooltip-muted); }
+[data-theme="legacy"] .chart-tooltip-row   { display: flex; align-items: center; gap: var(--space-2); padding: 2px 0; }
+
+/* ── Legend ─────────────────────────────────────────────────────────────────── */
+[data-theme="legacy"] .chart-legend      { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-3); }
+[data-theme="legacy"] .chart-legend-item { display: inline-flex; align-items: center; gap: var(--space-2); font-family: var(--font-sans); font-size: var(--text-sm-size); color: var(--color-text-secondary); letter-spacing: var(--text-sm-ls); cursor: pointer; }
+[data-theme="legacy"] .chart-legend-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── Axis + gridlines ───────────────────────────────────────────────────────── */
+[data-theme="legacy"] .chart-axis-line  { stroke: var(--color-chart-axis); stroke-width: 1; }
+[data-theme="legacy"] .chart-gridline   { stroke: var(--color-chart-gridline); stroke-width: 1; stroke-dasharray: 4 4; }
+[data-theme="legacy"] .chart-axis-label { fill: var(--color-chart-label); font-size: 11px; font-family: var(--font-sans); }
+
+
+/* ============================================================================
+   20. DASHBOARD & ANCHOR VIEW LAYOUT RULES
+   AI AGENTS: ALWAYS follow these rules for dashboard and anchor view pages.
+   ============================================================================
+
+   RULE: EQUAL-HEIGHT CARDS IN GRID ROWS
+   ──────────────────────────────────────
+   In any multi-column grid row, ALL cards MUST stretch to fill the tallest
+   card in that row. Cards must never be shorter than their row siblings.
+
+   REQUIRED IMPLEMENTATION — three steps, all three are mandatory:
+
+   1. Every grid row MUST have `items-stretch`:
+        <div className="grid grid-cols-N gap-[var(--spacing-card-padding)] items-stretch">
+
+   2. Every card component MUST have `h-full` to fill its cell:
+        <Card className="h-full ...">
+
+   3. NEVER wrap a card in an intermediate div for col-span.
+      Apply col-span directly on the card component:
+        CORRECT:  <MyCard className="col-span-2" />
+        WRONG:    <div className="col-span-2"><MyCard /></div>
+
+   ============================================================================ */
+
+/* ============================================================================
+   21. UNTITLED / DATA-SLOT GLOBAL ENFORCEMENT (legacy theme)
+   Applies legacy tokens to facades that expose `data-slot` hooks.
+   Uses data-slot selectors to align with Tailwind / Untitled utilities.
+   AI AGENTS: These rules ensure theme compliance without manual overrides.
+   ============================================================================ */
+
+/* ── Cards ─────────────────────────────────────────────────────────────────── */
+/* Cards use shadow, NO border, 8px radius */
+[data-theme="legacy"] [data-slot="card"] {
+  background-color: var(--color-bg-primary) !important;
+  border: none !important;
+  border-radius: var(--border-radius-lg) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+[data-theme="legacy"] [data-slot="card-header"] {
+  padding: var(--spacing-card-padding) !important;
+  padding-bottom: 0 !important;
+  gap: var(--space-1) !important;
+}
+[data-theme="legacy"] [data-slot="card-title"] {
+  font-size: var(--text-h3-size) !important;
+  line-height: var(--text-h3-lh) !important;
+  letter-spacing: var(--text-h3-ls) !important;
+  font-weight: var(--text-h3-weight) !important;
+  color: var(--color-text-primary) !important;
+}
+[data-theme="legacy"] [data-slot="card-description"] {
+  font-size: var(--text-body-size) !important;
+  line-height: var(--text-body-lh) !important;
+  color: var(--color-text-secondary) !important;
+}
+[data-theme="legacy"] [data-slot="card-content"] {
+  padding: var(--spacing-card-padding) !important;
+}
+[data-theme="legacy"] [data-slot="card-footer"] {
+  padding: var(--spacing-card-padding) !important;
+  padding-top: 0 !important;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────────── */
+/* Legacy horizontal padding only (--space-2). Vertical rhythm + four sizes come from Untitled (py / text); no legacy height tokens. */
+[data-theme="legacy"] [data-slot="button"] {
+  border-radius: var(--border-radius-md) !important;
+  font-weight: 500 !important;
+  gap: var(--space-2) !important;
+  padding-left: var(--space-2) !important;
+  padding-right: var(--space-2) !important;
+}
+/* Primary button colors — default variant only (UuiAppButton always sets data-variant) */
+[data-theme="legacy"] [data-slot="button"][data-variant="default"] {
+  background-color: var(--color-brand-500) !important;
+  color: var(--color-text-inverse) !important;
+}
+[data-theme="legacy"] [data-slot="button"][data-variant="default"]:hover {
+  background-color: var(--color-brand-600) !important;
+}
+[data-theme="legacy"] [data-slot="button"][data-variant="default"]:active {
+  background-color: var(--color-brand-700) !important;
+}
+/* Outline — no fill; border uses outline/input token (--input) */
+[data-theme="legacy"] [data-slot="button"][data-variant="outline"] {
+  background-color: transparent !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--input) !important;
+}
+[data-theme="legacy"] [data-slot="button"][data-variant="outline"]:hover:not(:disabled):not([aria-disabled="true"]) {
+  background-color: transparent !important;
+  border-color: rgb(0 0 0) !important;
+}
+[data-theme="legacy"] [data-slot="button"][data-variant="outline"]:active:not(:disabled):not([aria-disabled="true"]) {
+  background-color: transparent !important;
+  border-color: #9ca3af !important;
+}
+[data-theme="legacy"] [data-slot="button"][data-variant="outline"]:disabled,
+[data-theme="legacy"] [data-slot="button"][data-variant="outline"][aria-disabled="true"] {
+  background-color: transparent !important;
+  border-color: var(--color-border-disabled) !important;
+}
+[data-theme="legacy"] [data-slot="button"][data-variant="outline"][data-loading]:not(:disabled):not([aria-disabled="true"]) {
+  background-color: transparent !important;
+}
+/* Secondary — gray ramp (unchanged) */
+[data-theme="legacy"] [data-slot="button"][data-variant="secondary"] {
+  background-color: var(--color-bg-btn-secondary) !important;
+  color: var(--color-text-primary) !important;
+  border: none !important;
+}
+[data-theme="legacy"] [data-slot="button"][data-variant="secondary"]:hover {
+  background-color: var(--color-bg-btn-secondary-hover) !important;
+}
+[data-theme="legacy"] [data-slot="button"][data-variant="secondary"]:active {
+  background-color: var(--color-bg-btn-secondary-active) !important;
+}
+/* Ghost button */
+[data-theme="legacy"] [data-slot="button"][data-variant="ghost"] {
+  background-color: transparent !important;
+  color: var(--color-text-primary) !important;
+  border: none !important;
+}
+[data-theme="legacy"] [data-slot="button"][data-variant="ghost"]:hover {
+  background-color: var(--color-bg-btn-secondary) !important;
+}
+/* Destructive (facade / UuiAppButton): rest = danger surface + danger label (banner-danger family); hover = solid danger; disabled = rest surface + muted danger text */
+[data-theme="legacy"] [data-slot="button"][data-variant="destructive"] {
+  background-color: var(--color-bg-feedback-danger) !important;
+  color: var(--color-text-danger) !important;
+  border: 1px solid transparent !important;
+}
+[data-theme="legacy"] [data-slot="button"][data-variant="destructive"]:hover:not(:disabled):not([aria-disabled="true"]),
+[data-theme="legacy"] [data-slot="button"][data-variant="destructive"]:active:not(:disabled):not([aria-disabled="true"]) {
+  background-color: var(--destructive) !important;
+  color: var(--destructive-foreground) !important;
+}
+[data-theme="legacy"] [data-slot="button"][data-variant="destructive"]:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--destructive) 30%, transparent) !important;
+}
+[data-theme="legacy"] [data-slot="button"][data-variant="destructive"]:disabled,
+[data-theme="legacy"] [data-slot="button"][data-variant="destructive"][aria-disabled="true"] {
+  background-color: var(--color-bg-feedback-danger) !important;
+  color: color-mix(in srgb, var(--color-text-danger) 40%, var(--color-text-disabled)) !important;
+}
+/* Loading keeps rest palette (spinner visible); do not switch to solid on hover while pending */
+[data-theme="legacy"] [data-slot="button"][data-variant="destructive"][data-loading]:not(:disabled):not([aria-disabled="true"]) {
+  background-color: var(--color-bg-feedback-danger) !important;
+  color: var(--color-text-danger) !important;
+}
+[data-theme="legacy"] [data-slot="button"][data-variant="destructive"][data-loading]:hover:not(:disabled):not([aria-disabled="true"]),
+[data-theme="legacy"] [data-slot="button"][data-variant="destructive"][data-loading]:active:not(:disabled):not([aria-disabled="true"]) {
+  background-color: var(--color-bg-feedback-danger) !important;
+  color: var(--color-text-danger) !important;
+}
+html.dark[data-theme="legacy"] [data-slot="button"][data-variant="destructive"] {
+  background-color: color-mix(in srgb, var(--destructive) 20%, var(--color-bg-tertiary)) !important;
+  color: color-mix(in srgb, var(--destructive) 92%, rgb(255 255 255)) !important;
+}
+html.dark[data-theme="legacy"] [data-slot="button"][data-variant="destructive"]:hover:not(:disabled):not([aria-disabled="true"]),
+html.dark[data-theme="legacy"] [data-slot="button"][data-variant="destructive"]:active:not(:disabled):not([aria-disabled="true"]),
+html.dark-mode[data-theme="legacy"] [data-slot="button"][data-variant="destructive"]:hover:not(:disabled):not([aria-disabled="true"]),
+html.dark-mode[data-theme="legacy"] [data-slot="button"][data-variant="destructive"]:active:not(:disabled):not([aria-disabled="true"]) {
+  background-color: var(--destructive) !important;
+  color: var(--destructive-foreground) !important;
+}
+html.dark[data-theme="legacy"] [data-slot="button"][data-variant="destructive"]:disabled,
+html.dark[data-theme="legacy"] [data-slot="button"][data-variant="destructive"][aria-disabled="true"],
+html.dark-mode[data-theme="legacy"] [data-slot="button"][data-variant="destructive"]:disabled,
+html.dark-mode[data-theme="legacy"] [data-slot="button"][data-variant="destructive"][aria-disabled="true"] {
+  background-color: color-mix(in srgb, var(--destructive) 16%, var(--color-bg-tertiary)) !important;
+  color: color-mix(in srgb, var(--destructive) 35%, var(--color-text-disabled)) !important;
+}
+html.dark[data-theme="legacy"] [data-slot="button"][data-variant="destructive"][data-loading]:not(:disabled):not([aria-disabled="true"]),
+html.dark-mode[data-theme="legacy"] [data-slot="button"][data-variant="destructive"][data-loading]:not(:disabled):not([aria-disabled="true"]) {
+  background-color: color-mix(in srgb, var(--destructive) 20%, var(--color-bg-tertiary)) !important;
+  color: color-mix(in srgb, var(--destructive) 92%, rgb(255 255 255)) !important;
+}
+html.dark[data-theme="legacy"] [data-slot="button"][data-variant="destructive"][data-loading]:hover:not(:disabled):not([aria-disabled="true"]),
+html.dark[data-theme="legacy"] [data-slot="button"][data-variant="destructive"][data-loading]:active:not(:disabled):not([aria-disabled="true"]),
+html.dark-mode[data-theme="legacy"] [data-slot="button"][data-variant="destructive"][data-loading]:hover:not(:disabled):not([aria-disabled="true"]),
+html.dark-mode[data-theme="legacy"] [data-slot="button"][data-variant="destructive"][data-loading]:active:not(:disabled):not([aria-disabled="true"]) {
+  background-color: color-mix(in srgb, var(--destructive) 20%, var(--color-bg-tertiary)) !important;
+  color: color-mix(in srgb, var(--destructive) 92%, rgb(255 255 255)) !important;
+}
+
+/* Destructive menu rows (dropdown / context) — danger label at rest; solid destructive on hover/focus (parity with button destructive hover above) */
+[data-theme="legacy"] [data-slot="menu-item"][data-variant="destructive"] {
+  background-color: transparent !important;
+  color: var(--color-text-danger) !important;
+}
+[data-theme="legacy"] [data-slot="menu-item"][data-variant="destructive"]:hover:not([data-disabled]),
+[data-theme="legacy"] [data-slot="menu-item"][data-variant="destructive"][data-focused]:not([data-disabled]) {
+  background-color: var(--destructive) !important;
+  color: var(--destructive-foreground) !important;
+}
+html.dark[data-theme="legacy"] [data-slot="menu-item"][data-variant="destructive"],
+html.dark-mode[data-theme="legacy"] [data-slot="menu-item"][data-variant="destructive"] {
+  background-color: transparent !important;
+  color: color-mix(in srgb, var(--destructive) 92%, rgb(255 255 255)) !important;
+}
+html.dark[data-theme="legacy"] [data-slot="menu-item"][data-variant="destructive"]:hover:not([data-disabled]),
+html.dark[data-theme="legacy"] [data-slot="menu-item"][data-variant="destructive"][data-focused]:not([data-disabled]),
+html.dark-mode[data-theme="legacy"] [data-slot="menu-item"][data-variant="destructive"]:hover:not([data-disabled]),
+html.dark-mode[data-theme="legacy"] [data-slot="menu-item"][data-variant="destructive"][data-focused]:not([data-disabled]) {
+  background-color: var(--destructive) !important;
+  color: var(--destructive-foreground) !important;
+}
+
+/* Icon-only: symmetric legacy inset; no --height-button square */
+[data-theme="legacy"] [data-slot="button"][data-size="icon"] {
+  padding: var(--space-2) !important;
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1;
+}
+
+/* ── Inputs ────────────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [data-slot="input"] {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  height: var(--height-input) !important;
+  border-radius: var(--border-radius-md) !important;
+  border: 1px solid var(--color-border-input-default) !important;
+  font-size: var(--text-body-size) !important;
+  padding: 0 var(--space-3) !important;
+  background-color: var(--color-bg-primary) !important;
+}
+/* Leading icon (e.g. uui-studio search) — default padding is symmetric !important above */
+[data-theme="legacy"] [data-slot="input"][data-icon-start] {
+  padding-left: 2.25rem !important;
+}
+[data-theme="legacy"] [data-slot="input"]:focus {
+  border-color: var(--color-border-input-focus) !important;
+  box-shadow: 0 0 0 2px var(--color-border-input-focus-ring) !important;
+}
+[data-theme="legacy"] [data-slot="input"]::placeholder {
+  color: var(--color-text-placeholder) !important;
+}
+
+/* ── Labels ────────────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [data-slot="label"] {
+  font-size: var(--text-body-size) !important;
+  font-weight: 500 !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* ── Tabs (RAC: active = data-selected; Radix used data-state="active") ─────── */
+[data-theme="legacy"] [data-slot="tabs-content"],
+[data-theme="legacy"] .react-aria-Tabs [role="tabpanel"] {
+  padding-top: var(--space-4) !important;
+}
+
+/* Underline (horizontal) — legacy app tab row */
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="underline"] {
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
+  border-radius: 0 !important;
+  gap: var(--space-4) !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="underline"] [data-slot="tabs-trigger"] {
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  padding: var(--space-2) 0 !important;
+  font-size: var(--text-body-size) !important;
+  font-weight: 500 !important;
+  color: var(--color-text-secondary) !important;
+  box-shadow: none !important;
+}
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="underline"] [data-slot="tabs-trigger"][data-selected],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="underline"] [data-slot="tabs-trigger"][data-state="active"] {
+  border-bottom-color: var(--color-text-primary) !important;
+  color: var(--color-text-primary) !important;
+  background-color: transparent !important;
+}
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="underline"] [data-slot="tabs-trigger"]:hover {
+  color: var(--color-text-primary) !important;
+}
+
+/* Vertical “line” tabs — left rail indicator */
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="line"] {
+  background-color: transparent !important;
+  border: none !important;
+  border-bottom: none !important;
+  border-radius: 0 !important;
+  gap: var(--space-1) !important;
+  padding: 0 !important;
+  height: auto !important;
+}
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="line"] [data-slot="tabs-trigger"] {
+  background-color: transparent !important;
+  border: none !important;
+  border-left: 2px solid transparent !important;
+  border-radius: 0 !important;
+  padding: var(--space-2) var(--space-3) !important;
+  font-size: var(--text-body-size) !important;
+  font-weight: 500 !important;
+  color: var(--color-text-secondary) !important;
+  box-shadow: none !important;
+  justify-content: flex-start !important;
+}
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="line"] [data-slot="tabs-trigger"][data-selected],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="line"] [data-slot="tabs-trigger"][data-state="active"] {
+  border-left-color: var(--color-text-primary) !important;
+  color: var(--color-text-primary) !important;
+  background-color: var(--color-bg-row-hover) !important;
+}
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="line"] [data-slot="tabs-trigger"]:hover {
+  color: var(--color-text-primary) !important;
+}
+
+/* Segmented button tabs (button-gray, button-brand, button-border, button-minimal) */
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-gray"],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-brand"],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-border"],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-minimal"] {
+  background-color: var(--color-bg-secondary) !important;
+  border: 1px solid var(--color-border-default) !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
+  border-radius: var(--border-radius-md) !important;
+  gap: var(--space-1) !important;
+  padding: var(--space-1) !important;
+  height: auto !important;
+  box-shadow: none !important;
+}
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-gray"]::before,
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-brand"]::before,
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-border"]::before,
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-minimal"]::before {
+  display: none !important;
+}
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-gray"] [data-slot="tabs-trigger"],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-brand"] [data-slot="tabs-trigger"],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-border"] [data-slot="tabs-trigger"],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-minimal"] [data-slot="tabs-trigger"] {
+  background-color: transparent !important;
+  border: none !important;
+  border-bottom: none !important;
+  border-radius: var(--border-radius-sm) !important;
+  padding: var(--space-2) var(--space-3) !important;
+  font-size: var(--text-body-size) !important;
+  font-weight: 500 !important;
+  color: var(--color-text-secondary) !important;
+  box-shadow: none !important;
+}
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-gray"] [data-slot="tabs-trigger"][data-selected],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-brand"] [data-slot="tabs-trigger"][data-selected],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-border"] [data-slot="tabs-trigger"][data-selected],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-minimal"] [data-slot="tabs-trigger"][data-selected],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-gray"] [data-slot="tabs-trigger"][data-state="active"],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-brand"] [data-slot="tabs-trigger"][data-state="active"],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-border"] [data-slot="tabs-trigger"][data-state="active"],
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-minimal"] [data-slot="tabs-trigger"][data-state="active"] {
+  background-color: var(--color-bg-primary) !important;
+  color: var(--color-text-primary) !important;
+  box-shadow: var(--shadow-xs) !important;
+}
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-gray"] [data-slot="tabs-trigger"]:hover,
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-brand"] [data-slot="tabs-trigger"]:hover,
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-border"] [data-slot="tabs-trigger"]:hover,
+[data-theme="legacy"] [data-slot="tabs-list"][data-list-type="button-minimal"] [data-slot="tabs-trigger"]:hover {
+  color: var(--color-text-primary) !important;
+}
+
+/* ── Tables ────────────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [data-slot="table"] {
+  font-size: var(--text-body-size) !important;
+}
+[data-theme="legacy"] [data-slot="table-head"] {
+  font-size: var(--text-sm-size) !important;
+  font-weight: 600 !important;
+  color: var(--color-text-secondary) !important;
+  background-color: var(--color-bg-secondary) !important;
+  height: var(--height-row) !important;
+  padding: 0 var(--space-3) !important;
+}
+[data-theme="legacy"] [data-slot="table-cell"] {
+  padding: var(--space-3) !important;
+  height: var(--height-row) !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
+}
+[data-theme="legacy"] [data-slot="table-row"]:hover {
+  background-color: var(--color-bg-row-hover) !important;
+}
+[data-theme="legacy"] [data-slot="table-row"][data-state="selected"] {
+  background-color: var(--color-bg-secondary) !important;
+}
+
+/* ── Badges (facade `[data-slot="badge"]`) — match §06 .badge: 20px pill, 0 × space-3 padding ── */
+[data-theme="legacy"] [data-slot="badge"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  border-radius: var(--border-radius-full) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-sm-size) !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  letter-spacing: var(--text-sm-ls) !important;
+  height: var(--height-badge) !important;
+  min-height: var(--height-badge) !important;
+  max-height: var(--height-badge) !important;
+  padding: 0 var(--space-3) !important;
+  box-shadow: none !important;
+  --tw-ring-width: 0 !important;
+  --tw-ring-offset-width: 0 !important;
+}
+
+/* ── Dialogs/Modals ────────────────────────────────────────────────────────── */
+/* RAC modal shell: guarantee readable width even if Tailwind utilities on `components/ui/dialog` were absent from the bundle */
+[data-theme="legacy"] .react-aria-ModalOverlay .react-aria-Modal {
+  box-sizing: border-box !important;
+  width: min(100%, 32rem) !important;
+  min-width: min(100%, 17.5rem) !important;
+  max-width: 32rem !important;
+}
+[data-theme="legacy"] [data-slot="dialog-content"],
+[data-theme="legacy"] [data-slot="sheet-content"],
+[data-theme="legacy"] [data-slot="slide-out-content"] {
+  background-color: var(--color-bg-primary) !important;
+  border-radius: var(--border-radius-lg) !important;
+  border: none !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+[data-theme="legacy"] [data-slot="dialog-header"],
+[data-theme="legacy"] [data-slot="sheet-header"],
+[data-theme="legacy"] [data-slot="slide-out-header"] {
+  padding: var(--spacing-card-padding) !important;
+  padding-bottom: var(--space-3) !important;
+}
+[data-theme="legacy"] [data-slot="dialog-title"],
+[data-theme="legacy"] [data-slot="sheet-title"],
+[data-theme="legacy"] [data-slot="slide-out-title"] {
+  font-size: var(--text-h2-size) !important;
+  font-weight: var(--text-h2-weight) !important;
+  line-height: var(--text-h2-lh) !important;
+  color: var(--color-text-primary) !important;
+}
+[data-theme="legacy"] [data-slot="dialog-description"],
+[data-theme="legacy"] [data-slot="sheet-description"],
+[data-theme="legacy"] [data-slot="slide-out-description"] {
+  font-size: var(--text-body-size) !important;
+  color: var(--color-text-secondary) !important;
+}
+
+/* ── Popovers/Dropdowns ────────────────────────────────────────────────────── */
+[data-theme="legacy"] [data-slot="popover-content"],
+[data-theme="legacy"] [data-slot="dropdown-menu-content"],
+[data-theme="legacy"] [data-slot="context-menu-content"],
+[data-theme="legacy"] [data-slot="menubar-content"],
+[data-theme="legacy"] [data-slot="select-content"] {
+  background-color: var(--color-bg-primary) !important;
+  border: 1px solid var(--color-border-default) !important;
+  border-radius: var(--border-radius-md) !important;
+  box-shadow: var(--shadow-md) !important;
+  padding: var(--space-1) !important;
+}
+[data-theme="legacy"] [data-slot="menu-item"],
+[data-theme="legacy"] [data-slot="dropdown-menu-item"],
+[data-theme="legacy"] [data-slot="context-menu-item"],
+[data-theme="legacy"] [data-slot="menubar-item"],
+[data-theme="legacy"] [data-slot="select-item"] {
+  font-size: var(--text-body-size) !important;
+  padding: var(--space-2) var(--space-3) !important;
+  border-radius: var(--border-radius-sm) !important;
+  color: var(--color-text-primary) !important;
+  outline: none !important;
+}
+/* Current option in list — before hover/focus rules so keyboard + pointer states still win (same !important). */
+[data-theme="legacy"] [data-slot="select-item"][data-selected] {
+  background-color: var(--color-bg-secondary) !important;
+}
+[data-theme="legacy"] [data-slot="menu-item"]:hover,
+[data-theme="legacy"] [data-slot="menu-item"][data-focused],
+[data-theme="legacy"] [data-slot="dropdown-menu-item"]:hover,
+[data-theme="legacy"] [data-slot="context-menu-item"]:hover,
+[data-theme="legacy"] [data-slot="menubar-item"]:hover,
+[data-theme="legacy"] [data-slot="select-item"]:hover,
+[data-theme="legacy"] [data-slot="dropdown-menu-item"][data-highlighted],
+[data-theme="legacy"] [data-slot="context-menu-item"][data-highlighted],
+[data-theme="legacy"] [data-slot="select-item"][data-highlighted],
+/* ListBox options use data-focused / data-hovered (not data-highlighted). */
+[data-theme="legacy"] [data-slot="select-item"][data-focused],
+[data-theme="legacy"] [data-slot="select-item"][data-hovered] {
+  background-color: var(--color-bg-row-hover) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Tooltips ──────────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [data-slot="tooltip-content"] {
+  background-color: var(--color-chart-tooltip-bg) !important;
+  color: var(--color-chart-tooltip-fg) !important;
+  border-radius: var(--border-radius-md) !important;
+  font-size: var(--text-sm-size) !important;
+  padding: var(--space-2) var(--space-3) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* ── Separators ────────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [data-slot="separator"] {
+  background-color: var(--color-border-default) !important;
+}
+
+/* ── Switch (Untitled `ToggleBase` pill) — off state matches unchecked checkbox ─
+   `bg-tertiary` on the track made it nearly invisible on white; unchecked checkbox
+   uses a single `inset 0 0 0 1px` stroke + legacy checkbox border token. */
+/* Same silhouette: primary surface + 1px edge via checkbox border token */
+[data-theme="legacy"] [role="switch"] > div.rounded-full.cursor-pointer.bg-tertiary:not(.bg-brand-solid):not(.bg-disabled):not(.ring-inset) {
+  background-color: var(--color-bg-primary) !important;
+  border: 1px solid var(--color-border-checkbox) !important;
+  box-sizing: border-box !important;
+}
+/* Slim variant: inset ring instead of outer border — align ring to checkbox border token */
+[data-theme="legacy"] [role="switch"] > div.rounded-full.cursor-pointer.bg-tertiary.ring-inset:not(.bg-brand-solid):not(.bg-disabled) {
+  background-color: var(--color-bg-primary) !important;
+  --tw-ring-color: var(--color-border-checkbox) !important;
+  box-sizing: border-box !important;
+}
+[data-theme="legacy"] [data-slot="switch-thumb"] {
+  height: 16px !important;
+  width: 16px !important;
+  background-color: var(--color-bg-primary) !important;
+}
+
+/* Untitled `Toggle` uses `bg-brand-solid` / `bg-brand-solid_hover` when selected; `data-state`
+   is not always on `[data-slot="switch"]`, so orange brand wins unless we override the utility.
+   Legacy interactive policy: switches use neutral on-state (same as checkbox-checked fill), not brand. */
+[data-theme="legacy"] [data-slot="switch"] .bg-brand-solid,
+[data-theme="legacy"] [data-slot="switch"] .bg-brand-solid_hover,
+[data-theme="legacy"] [role="switch"] .bg-brand-solid,
+[data-theme="legacy"] [role="switch"] .bg-brand-solid_hover {
+  background-color: var(--color-text-primary) !important;
+}
+
+/* ── Checkbox/Radio ────────────────────────────────────────────────────────── */
+/* Untitled CheckboxBase ships `ring-1 ring-inset`; Tailwind v4 often still paints a stacked edge
+   next to legacy token work — use one inset box-shadow for the stroke and zero the ring chain. */
+[data-theme="legacy"] [data-slot="checkbox"].react-aria-Checkbox {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+[data-theme="legacy"] [data-slot="checkbox"].react-aria-Checkbox input[type="checkbox"] {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+[data-theme="legacy"] [data-slot="checkbox"] [data-slot="checkbox-indicator"] {
+  border: none !important;
+  background-color: var(--color-bg-primary) !important;
+  outline: none !important;
+  box-shadow: inset 0 0 0 1px var(--color-border-checkbox) !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-inset-ring-shadow: 0 0 #0000 !important;
+  --tw-shadow: 0 0 #0000 !important;
+  --tw-inset-shadow: 0 0 #0000 !important;
+}
+[data-theme="legacy"] [data-slot="checkbox"][data-selected] [data-slot="checkbox-indicator"],
+[data-theme="legacy"] [data-slot="checkbox"][data-indeterminate] [data-slot="checkbox-indicator"] {
+  background-color: var(--color-text-primary) !important;
+  color: var(--color-text-inverse) !important;
+  box-shadow: none !important;
+}
+[data-theme="legacy"] [data-slot="checkbox"][data-selected] [data-slot="checkbox-indicator"].bg-brand-solid,
+[data-theme="legacy"] [data-slot="checkbox"][data-indeterminate] [data-slot="checkbox-indicator"].bg-brand-solid,
+[data-theme="legacy"] [data-slot="checkbox"][data-selected] [data-slot="checkbox-indicator"].bg-brand-solid_hover,
+[data-theme="legacy"] [data-slot="checkbox"][data-indeterminate] [data-slot="checkbox-indicator"].bg-brand-solid_hover {
+  background-color: var(--color-text-primary) !important;
+}
+[data-theme="legacy"] [data-slot="checkbox"][data-selected] [data-slot="checkbox-indicator"] svg,
+[data-theme="legacy"] [data-slot="checkbox"][data-indeterminate] [data-slot="checkbox-indicator"] svg {
+  color: var(--color-text-inverse) !important;
+}
+[data-theme="legacy"] [data-slot="checkbox"][data-disabled] [data-slot="checkbox-indicator"] {
+  cursor: not-allowed !important;
+  background-color: var(--color-bg-disabled) !important;
+  opacity: 1 !important;
+  box-shadow: inset 0 0 0 1px var(--color-border-disabled) !important;
+}
+[data-theme="legacy"] [data-slot="checkbox"][data-disabled][data-selected] [data-slot="checkbox-indicator"],
+[data-theme="legacy"] [data-slot="checkbox"][data-disabled][data-indeterminate] [data-slot="checkbox-indicator"] {
+  background-color: var(--color-bg-tertiary) !important;
+  color: var(--color-text-disabled) !important;
+  box-shadow: inset 0 0 0 1px var(--color-border-disabled) !important;
+}
+[data-theme="legacy"] [data-slot="checkbox"][data-disabled][data-selected] [data-slot="checkbox-indicator"] svg,
+[data-theme="legacy"] [data-slot="checkbox"][data-disabled][data-indeterminate] [data-slot="checkbox-indicator"] svg {
+  color: var(--color-text-disabled) !important;
+}
+[data-theme="legacy"] [data-slot="checkbox"][data-focus-visible]:not([data-disabled]) [data-slot="checkbox-indicator"] {
+  outline: 2px solid var(--color-border-input-focus) !important;
+  outline-offset: 2px !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-inset-ring-shadow: 0 0 #0000 !important;
+  --tw-shadow: 0 0 #0000 !important;
+  --tw-inset-shadow: 0 0 #0000 !important;
+}
+[data-theme="legacy"] [data-slot="checkbox"][data-focus-visible]:not([data-disabled]):not([data-selected]):not([data-indeterminate]) [data-slot="checkbox-indicator"] {
+  box-shadow: inset 0 0 0 1px var(--color-border-checkbox) !important;
+}
+[data-theme="legacy"] [data-slot="checkbox"][data-focus-visible]:not([data-disabled])[data-selected] [data-slot="checkbox-indicator"],
+[data-theme="legacy"] [data-slot="checkbox"][data-focus-visible]:not([data-disabled])[data-indeterminate] [data-slot="checkbox-indicator"] {
+  box-shadow: none !important;
+}
+
+/* Radio: `data-slot="radio-group-item"` sits on the RAC <label> (whole row). Style the inner
+   `data-slot="radio-indicator"` circle only — same pattern as checkbox (avoids Radix-era full-row border).
+   RAC uses `data-selected`, not `data-state="checked"`. */
+[data-theme="legacy"] [data-slot="radio-group-item"].react-aria-Radio {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+[data-theme="legacy"] [data-slot="radio-group-item"].react-aria-Radio input[type="radio"] {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+[data-theme="legacy"] [data-slot="radio-group-item"] [data-slot="radio-indicator"] {
+  border: none !important;
+  background-color: var(--color-bg-primary) !important;
+  outline: none !important;
+  box-shadow: inset 0 0 0 1px var(--color-border-checkbox) !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-inset-ring-shadow: 0 0 #0000 !important;
+  --tw-shadow: 0 0 #0000 !important;
+  --tw-inset-shadow: 0 0 #0000 !important;
+}
+[data-theme="legacy"] [data-slot="radio-group-item"][data-selected] [data-slot="radio-indicator"],
+[data-theme="legacy"] [data-slot="radio-group-item"][data-selected] [data-slot="radio-indicator"].bg-brand-solid,
+[data-theme="legacy"] [data-slot="radio-group-item"][data-selected] [data-slot="radio-indicator"].ring-bg-brand-solid {
+  background-color: var(--color-text-primary) !important;
+  box-shadow: none !important;
+}
+[data-theme="legacy"] [data-slot="radio-group-item"][data-selected] [data-slot="radio-indicator"] .rounded-full.bg-fg-white {
+  background-color: var(--color-text-inverse) !important;
+  opacity: 1 !important;
+}
+[data-theme="legacy"] [data-slot="radio-group-item"][data-disabled] [data-slot="radio-indicator"] {
+  cursor: not-allowed !important;
+  background-color: var(--color-bg-disabled) !important;
+  opacity: 1 !important;
+  box-shadow: inset 0 0 0 1px var(--color-border-disabled) !important;
+}
+[data-theme="legacy"] [data-slot="radio-group-item"][data-disabled][data-selected] [data-slot="radio-indicator"] {
+  background-color: var(--color-bg-tertiary) !important;
+  box-shadow: inset 0 0 0 1px var(--color-border-disabled) !important;
+}
+[data-theme="legacy"] [data-slot="radio-group-item"][data-disabled][data-selected] [data-slot="radio-indicator"] .rounded-full.bg-fg-white {
+  background-color: var(--color-text-disabled) !important;
+}
+[data-theme="legacy"] [data-slot="radio-group-item"][data-focus-visible]:not([data-disabled]) [data-slot="radio-indicator"] {
+  outline: 2px solid var(--color-border-input-focus) !important;
+  outline-offset: 2px !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-inset-ring-shadow: 0 0 #0000 !important;
+  --tw-shadow: 0 0 #0000 !important;
+  --tw-inset-shadow: 0 0 #0000 !important;
+}
+[data-theme="legacy"] [data-slot="radio-group-item"][data-focus-visible]:not([data-disabled]):not([data-selected]) [data-slot="radio-indicator"] {
+  box-shadow: inset 0 0 0 1px var(--color-border-checkbox) !important;
+}
+[data-theme="legacy"] [data-slot="radio-group-item"][data-focus-visible]:not([data-disabled])[data-selected] [data-slot="radio-indicator"] {
+  box-shadow: none !important;
+}
+
+/* ── Date picker / range picker (Untitled application) ─────────────────────
+   Calendar selection, date-segment focus, and primary Apply use `bg-brand-solid` / `ring-brand` /
+   `bg-fg-brand-primary`. Legacy policy: neutral selection (parity with checkbox checked + switch on),
+   not orange brand. Scoped via `data-slot` from Design-System date-picker primitives. */
+[data-theme="legacy"] [data-slot="date-picker-dialog"] .bg-brand-solid,
+[data-theme="legacy"] [data-slot="calendar"] .bg-brand-solid,
+[data-theme="legacy"] [data-slot="date-picker-dialog"] .bg-brand-solid_hover,
+[data-theme="legacy"] [data-slot="calendar"] .bg-brand-solid_hover {
+  background-color: var(--color-text-primary) !important;
+  color: var(--color-text-inverse) !important;
+}
+[data-theme="legacy"] [data-slot="date-picker-dialog"] .hover\:bg-brand-solid_hover:hover,
+[data-theme="legacy"] [data-slot="calendar"] .hover\:bg-brand-solid_hover:hover,
+[data-theme="legacy"] [data-slot="date-picker-dialog"] .hover\:bg-brand-solid:hover,
+[data-theme="legacy"] [data-slot="calendar"] .hover\:bg-brand-solid:hover {
+  background-color: color-mix(in srgb, var(--color-text-primary) 88%, black) !important;
+  color: var(--color-text-inverse) !important;
+}
+[data-theme="legacy"] [data-slot="date-picker-dialog"] .focus\:bg-brand-solid:focus,
+[data-theme="legacy"] [data-slot="calendar"] .focus\:bg-brand-solid:focus,
+[data-theme="legacy"] [data-slot="date-input"] .focus\:bg-brand-solid:focus {
+  background-color: var(--color-text-primary) !important;
+  color: var(--color-text-inverse) !important;
+}
+[data-theme="legacy"] [data-slot="date-picker-dialog"] .bg-fg-brand-primary,
+[data-theme="legacy"] [data-slot="calendar"] .bg-fg-brand-primary {
+  background-color: var(--color-text-primary) !important;
+}
+[data-theme="legacy"] [data-slot="date-input"]:focus-within {
+  --tw-ring-color: var(--color-border-input-focus) !important;
+}
+[data-theme="legacy"] [data-slot="date-picker-dialog"] .active\:bg-brand-700:active {
+  background-color: color-mix(in srgb, var(--color-text-primary) 78%, black) !important;
+  color: var(--color-text-inverse) !important;
+}
+[data-theme="legacy"] [data-slot="date-picker-dialog"] .data-loading\:bg-brand-solid_hover[data-loading] {
+  background-color: var(--color-text-primary) !important;
+  color: var(--color-text-inverse) !important;
+}
+[data-theme="legacy"] [data-slot="date-picker-dialog"] .outline-brand {
+  outline-color: var(--color-border-input-focus) !important;
+}
+
+/* ── Progress ──────────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [data-slot="progress"] {
+  height: 8px !important;
+  border-radius: var(--border-radius-full) !important;
+  background-color: var(--color-bg-tertiary) !important;
+}
+[data-theme="legacy"] [data-slot="progress-indicator"] {
+  background-color: var(--color-text-primary) !important;
+  border-radius: var(--border-radius-full) !important;
+}
+
+/* ── Skeleton ──────────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [data-slot="skeleton"] {
+  background-color: var(--color-bg-tertiary) !important;
+  border-radius: var(--border-radius-md) !important;
+}
+
+/* ── Scroll Area ───────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [data-slot="scroll-area-thumb"] {
+  background-color: var(--color-border-strong) !important;
+  border-radius: var(--border-radius-full) !important;
+}
+
+/* ── Alert ─────────────────────────────────────────────────────────────────── */
+[data-theme="legacy"] [data-slot="alert"] {
+  border-radius: var(--border-radius-lg) !important;
+  padding: var(--spacing-card-padding) !important;
+  font-size: var(--text-body-size) !important;
+}
+
+/* ============================================================================
+   21b. COLOR SCHEME — light default; dark when app theme is dark
+   OS dark preference alone does not switch the app unless next-themes applies
+   `dark` / `dark-mode` (see ThemeProvider). This avoids unstyled flashes.
+   ============================================================================ */
+
+html[data-theme="legacy"]:not(.dark):not(.dark-mode) {
+  color-scheme: light;
+}
+
+html.dark[data-theme="legacy"],
+html.dark-mode[data-theme="legacy"] {
+  color-scheme: dark;
+}
+
+/* If OS is dark but the user has not enabled app dark, keep canvas legible */
+@media (prefers-color-scheme: dark) {
+  html[data-theme="legacy"]:not(.dark):not(.dark-mode) {
+    background-color: var(--color-bg-canvas);
+    color: var(--color-text-primary);
+    color-scheme: light;
+  }
+}
+
+/* ============================================================================
+   22. GLOBAL HEADER DARK SURFACE PATCH
+   The global header uses a dark (asphalt-900) background which is intentional
+   and permanent — it is NOT part of the light-only legacy theme surfaces.
+   These rules undo the legacy theme !important overrides scoped to the header
+   so that buttons, icons, text and interactive elements remain visible on dark.
+
+   AI AGENTS — MANDATORY RULES FOR THE GLOBAL HEADER:
+   ────────────────────────────────────────────────────
+   1. The global header ([data-header="global"]) is the ONLY component that
+      uses conditional color logic based on navigation context (mode).
+
+   2. Home icon uses the same light-on-dark treatment in both contexts (neutral):
+        Company and project mode → #ffffff via data-home-context (attribute kept for hooks).
+
+   3. ALL other header elements use fixed dark-surface colors:
+        - Selector values (text): #ffffff, font-semibold
+        - Selector labels (subtext): rgba(255,255,255,0.5)
+        - Action icon buttons (.header-icon-btn): rgba(255,255,255,0.75), #ffffff on hover
+        - Dividers: rgba(255,255,255,0.15)
+        - Button backgrounds: transparent, rgba(255,255,255,0.08) on hover
+
+   4. NEVER use the shared Button facade inside the header — always use native <button>
+      with class "header-icon-btn" for icon-only actions to avoid !important conflicts.
+
+   5. Popovers and dropdowns triggered from the header open OUTSIDE the header
+      DOM node — they correctly inherit legacy light-theme styles. Do NOT patch them.
+   ============================================================================ */
+
+/* Reset button colors inside dark header — ghost / Untitled tertiary icon slots use
+   *:data-icon:text-fg-quaternary (dark gray); must override so icons match header chrome. */
+[data-header="global"] [data-slot="button"] {
+  background-color: transparent !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  border: none !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+[data-header="global"] [data-slot="button"]:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+[data-header="global"] [data-slot="button"] [data-icon],
+[data-header="global"] [data-slot="button"] svg {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+[data-header="global"] [data-slot="button"]:hover [data-icon],
+[data-header="global"] [data-slot="button"]:hover svg {
+  color: #ffffff !important;
+}
+
+/* Popovers/dropdowns triggered from the header open OUTSIDE it so inherit
+   legacy light styles — no overrides needed for those. */
+
+/* All native buttons in the header — full white, transparent bg */
+[data-header="global"] button {
+  background: transparent !important;
+  border: none !important;
+  color: #ffffff !important;
+}
+[data-header="global"] button:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+/* Selector trigger buttons: label row is dim, value row is full white semibold */
+[data-header="global"] button span.text-asphalt-400 {
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-weight: 400 !important;
+}
+[data-header="global"] button span.text-white {
+  color: #ffffff !important;
+  /* font-weight is NOT overridden here — let font-semibold from the component win */
+}
+
+/* Icon-only action buttons — dim white, full white on hover */
+[data-header="global"] button.header-icon-btn {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+[data-header="global"] button.header-icon-btn:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Notifications (or other toggles) open — brand active icon on dark chrome */
+[data-header="global"] button.header-icon-btn.header-icon-btn--active,
+[data-header="global"] [data-slot="button"].header-icon-btn.header-icon-btn--active {
+  color: var(--color-brand-500) !important;
+}
+[data-header="global"] button.header-icon-btn.header-icon-btn--active [data-icon],
+[data-header="global"] button.header-icon-btn.header-icon-btn--active svg,
+[data-header="global"] [data-slot="button"].header-icon-btn.header-icon-btn--active [data-icon],
+[data-header="global"] [data-slot="button"].header-icon-btn.header-icon-btn--active svg {
+  color: var(--color-brand-500) !important;
+}
+[data-header="global"] button.header-icon-btn.header-icon-btn--active:hover,
+[data-header="global"] [data-slot="button"].header-icon-btn.header-icon-btn--active:hover {
+  color: var(--color-brand-400) !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-header="global"] button.header-icon-btn.header-icon-btn--active:hover [data-icon],
+[data-header="global"] button.header-icon-btn.header-icon-btn--active:hover svg,
+[data-header="global"] [data-slot="button"].header-icon-btn.header-icon-btn--active:hover [data-icon],
+[data-header="global"] [data-slot="button"].header-icon-btn.header-icon-btn--active:hover svg {
+  color: var(--color-brand-400) !important;
+}
+
+/* Unread / activity pip on dark chrome — brand accent; scoped so header button resets never flatten it */
+[data-header="global"] .header-notification-badge {
+  background-color: var(--color-brand-500) !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+/* Home button — color is context-driven via data attribute */
+[data-header="global"] button[data-home-context="company"] {
+  color: #ffffff !important;
+}
+[data-header="global"] button[data-home-context="project"] {
+  color: #ffffff !important;
+}
+
+/* Vertical divider lines inside the header */
+[data-header="global"] [data-slot="separator"] {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Input inside header (assist search) */
+[data-header="global"] [data-slot="input"] {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  height: 2rem !important;
+}
+[data-header="global"] [data-slot="input"]::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Assist trigger — same visual language + height as header [data-slot="input"] (2rem / 32px). */
+[data-header="global"] button[data-assist-search],
+[data-header="global"] button[data-assist-search]:hover {
+  height: 2rem !important;
+  min-height: 2rem !important;
+  box-sizing: border-box !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: var(--radius-sm) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+[data-header="global"] button[data-assist-search]:hover {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+[data-header="global"] button[data-assist-search] .assist-trigger-placeholder {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+[data-header="global"] button[data-assist-search] kbd {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.82) !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+/* ── Assist Chat Loader
+   Strip is flush with the header’s bottom border (no gap).
+   Idle: 2px-tall vertical linear gradient #c7c7c7 → #ffffff (no border/shadow).
+   Loading: transparent rail + orange→cyan segments + bottom-glow.
+   ─────────────────────────────────────────────────────────────────────────── */
+[data-assist-loader-rail] {
+  flex-shrink: 0;
+  background: var(--color-bg-primary, #fff);
+}
+
+.assist-loader {
+  width: 100%;
+  height: 2px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.assist-loader--idle {
+  display: block;
+  border: none;
+  box-shadow: none;
+  background: linear-gradient(180deg, #c7c7c7 0%, #ffffff 100%);
+}
+
+.assist-loader--loading {
+  display: flex;
+  background: transparent;
+  box-shadow: none;
+}
+
+@keyframes bottom-glow-wave {
+  0%, 100% {
+    opacity: 0.5;
+    box-shadow: 0 1px 1px currentColor;
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 1px 2px currentColor, 0 2px 3px currentColor;
+  }
+}
+
+.loader-segment {
+  flex: 1;
+  height: 100%;
+  animation: bottom-glow-wave 800ms ease-in-out infinite;
+}
+
+.loader-segment:nth-child(1)  { animation-delay: 0ms; }
+.loader-segment:nth-child(2)  { animation-delay: 50ms; }
+.loader-segment:nth-child(3)  { animation-delay: 100ms; }
+.loader-segment:nth-child(4)  { animation-delay: 150ms; }
+.loader-segment:nth-child(5)  { animation-delay: 200ms; }
+.loader-segment:nth-child(6)  { animation-delay: 250ms; }
+.loader-segment:nth-child(7)  { animation-delay: 300ms; }
+.loader-segment:nth-child(8)  { animation-delay: 350ms; }
+.loader-segment:nth-child(9)  { animation-delay: 400ms; }
+.loader-segment:nth-child(10) { animation-delay: 450ms; }
+.loader-segment:nth-child(11) { animation-delay: 500ms; }
+.loader-segment:nth-child(12) { animation-delay: 550ms; }
+
+/* ── Assist Icon Pulse Animation ─────────────────────────────────────────────
+   Used in the loading chat bubble. sparkle-small has a 0.3s delay for wave.
+   ─────────────────────────────────────────────────────────────────────────── */
+@keyframes pulse-sparkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.85); }
+}
+
+.sparkle-large {
+  animation: pulse-sparkle 1.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.sparkle-small {
+  animation: pulse-sparkle 1.5s ease-in-out infinite 0.3s;
+  transform-origin: center;
+}

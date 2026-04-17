@@ -1,0 +1,132 @@
+/**
+ * NGX canonical design tokens (`--ds-*`) — single authoring spine for the app shell.
+ * Legacy `[data-theme="legacy"]` maps `--color-*` → `var(--ds-*)`; Tailwind semantic vars map from `--color-*`.
+ * Dark: same names, overridden on `html.dark[data-theme="legacy"]` + `.dark-mode`.
+ */
+@layer untitled-ui {
+  :root {
+    /* ── Motion (reference in CSS / arbitrary Tailwind) ───────────────────── */
+    --ds-motion-duration-short: 150ms;
+    --ds-motion-duration-medium: 220ms;
+    --ds-motion-duration-long: 300ms;
+    --ds-motion-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --ds-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+
+    /* Shorter alias names (docs / legacy references) — same as `--ds-motion-*` */
+    --motion-duration-short: var(--ds-motion-duration-short);
+    --motion-duration-medium: var(--ds-motion-duration-medium);
+    --motion-duration-long: var(--ds-motion-duration-long);
+    --motion-easing-standard: var(--ds-motion-easing-standard);
+    --motion-easing-emphasized: var(--ds-motion-easing-emphasized);
+
+    /* ── Brand ramp (Procore / NGX orange) ───────────────────────────────── */
+    --ds-brand-25: rgb(255 244 240);
+    --ds-brand-50: rgb(255 236 228);
+    --ds-brand-100: rgb(255 213 194);
+    --ds-brand-200: rgb(255 180 153);
+    --ds-brand-300: rgb(255 138 92);
+    --ds-brand-400: rgb(255 107 47);
+    --ds-brand-500: rgb(255 82 0);
+    --ds-brand-600: rgb(230 73 0);
+    --ds-brand-700: rgb(204 63 0);
+    --ds-brand-800: rgb(158 49 0);
+    --ds-brand-900: rgb(116 36 0);
+    --ds-brand-950: rgb(72 22 0);
+
+    /* ── Surfaces (light) ─────────────────────────────────────────────────── */
+    --ds-bg-canvas: rgb(245 245 245);
+    --ds-bg-primary: rgb(255 255 255);
+    --ds-bg-secondary: rgb(248 249 250); /* subtle hover, muted strips — not static table/page headers */
+    --ds-bg-tertiary: rgb(243 244 246);
+    --ds-bg-disabled: rgb(243 244 246);
+    --ds-bg-btn-secondary: rgb(238 240 241);
+    --ds-bg-btn-secondary-hover: rgb(228 231 233);
+    --ds-bg-btn-secondary-active: rgb(215 219 222);
+    --ds-bg-btn-secondary-disabled: rgb(243 244 246);
+    --ds-bg-row-active: rgb(254 249 240);
+    --ds-bg-overlay: rgb(255 255 255);
+    --ds-bg-feedback-info: rgb(239 246 255);
+    --ds-bg-feedback-success: rgb(209 250 229);
+    --ds-bg-feedback-warning: rgb(255 251 235);
+    --ds-bg-feedback-danger: rgb(254 226 226);
+    --ds-bg-nav: rgb(0 0 0);
+
+    /* ── Text (light) ──────────────────────────────────────────────────────── */
+    --ds-text-primary: rgb(17 24 39);
+    --ds-text-secondary: rgb(55 65 81);
+    --ds-text-tertiary: rgb(107 114 128);
+    --ds-text-disabled: rgb(156 163 175);
+    --ds-text-inverse: rgb(255 255 255);
+    --ds-text-placeholder: rgb(156 163 175);
+    --ds-text-link: rgb(29 92 201);
+    --ds-text-link-hover: rgb(22 72 160);
+    --ds-text-info: rgb(30 64 175);
+    --ds-text-success: rgb(6 95 70);
+    --ds-text-warning: rgb(146 64 14);
+    --ds-text-danger: rgb(153 27 27);
+    --ds-text-nav: rgb(255 255 255);
+    --ds-text-nav-muted: rgb(156 163 175);
+
+    /* ── Borders (light) ───────────────────────────────────────────────────── */
+    --ds-border-default: rgb(229 231 235);
+    --ds-border-hover: rgb(209 213 219);
+    --ds-border-strong: rgb(156 163 175);
+    --ds-border-disabled: rgb(229 231 235);
+    --ds-border-input-default: rgb(209 213 219);
+    --ds-border-input-hover: rgb(156 163 175);
+    --ds-border-input-focus: rgb(32 102 223);
+    --ds-border-input-disabled: rgb(229 231 235);
+    /* Checkbox / tick-box resting edge — NGX asphalt-400 (#a3a3a3), distinct from input field gray */
+    --ds-border-checkbox: rgb(163 163 163);
+    --ds-border-row-active: rgb(255 82 0);
+    --ds-border-feedback-info: rgb(29 111 196);
+    --ds-border-feedback-success: rgb(5 150 105);
+    --ds-border-feedback-warning: rgb(245 158 11);
+    --ds-border-feedback-danger: rgb(220 38 38);
+    --ds-border-nav-active: rgb(255 82 0);
+
+    /* ── Semantic actions ──────────────────────────────────────────────────── */
+    --ds-destructive: rgb(220 38 38);
+    --ds-destructive-foreground: rgb(255 255 255);
+
+    /* ── Nav item (light context / sidebar) ─────────────────────────────────── */
+    --ds-bg-nav-item-hover: rgb(38 38 38);
+    --ds-bg-nav-item-active: rgb(51 51 51);
+  }
+
+  html.dark[data-theme="legacy"],
+  html.dark-mode[data-theme="legacy"] {
+    color-scheme: dark;
+
+    --ds-bg-canvas: rgb(23 23 23);
+    --ds-bg-primary: rgb(38 38 38);
+    --ds-bg-secondary: rgb(31 41 55);
+    --ds-bg-tertiary: rgb(55 65 81);
+    --ds-bg-disabled: rgb(55 65 81);
+    --ds-bg-btn-secondary: rgb(63 63 70);
+    --ds-bg-btn-secondary-hover: rgb(82 82 91);
+    --ds-bg-btn-secondary-active: rgb(63 63 70);
+    --ds-bg-btn-secondary-disabled: rgb(39 39 42);
+    --ds-bg-row-active: rgb(55 40 28);
+    --ds-bg-overlay: rgb(38 38 38);
+
+    --ds-text-primary: rgb(250 250 250);
+    --ds-text-secondary: rgb(209 213 219);
+    --ds-text-tertiary: rgb(156 163 175);
+    --ds-text-disabled: rgb(113 113 122);
+    --ds-text-placeholder: rgb(113 113 122);
+
+    --ds-border-default: rgb(63 63 70);
+    --ds-border-hover: rgb(82 82 91);
+    --ds-border-strong: rgb(113 113 122);
+    --ds-border-disabled: rgb(39 39 42);
+    --ds-border-input-default: rgb(82 82 91);
+    --ds-border-input-hover: rgb(113 113 122);
+    --ds-border-input-focus: rgb(96 165 250);
+    --ds-border-input-disabled: rgb(63 63 70);
+    --ds-border-checkbox: rgb(113 113 122);
+
+    --ds-destructive: rgb(248 113 113);
+    --ds-destructive-foreground: rgb(24 24 27);
+  }
+}

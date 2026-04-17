@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "target": "ES6",
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@untitledui/react": ["./Design-System"],
+      "@untitledui/react/*": ["./Design-System/*"],
+      "@/components/application/*": ["./Design-System/components/application/*"],
+      "@/components/internal/*": ["./Design-System/components/internal/*"],
+      "@/components/base/*": ["./Design-System/components/base/*"],
+      "@/components/foundations/*": ["./Design-System/components/foundations/*"],
+      "@/components/shared-assets/*": ["./Design-System/components/shared-assets/*"],
+      "@/utils/*": ["./Design-System/utils/*"],
+      "@/hooks/*": ["./Design-System/hooks/*"],
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

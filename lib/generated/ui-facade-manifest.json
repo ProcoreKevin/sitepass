@@ -1,0 +1,275 @@
+{
+  "generatedAt": "2026-03-26T21:19:57.356Z",
+  "facades": [
+    {
+      "slug": "accordion",
+      "file": "components/ui/accordion.tsx",
+      "label": "Accordion"
+    },
+    {
+      "slug": "alert-dialog",
+      "file": "components/ui/alert-dialog.tsx",
+      "label": "Alert Dialog"
+    },
+    {
+      "slug": "alert",
+      "file": "components/ui/alert.tsx",
+      "label": "Alert"
+    },
+    {
+      "slug": "aspect-ratio",
+      "file": "components/ui/aspect-ratio.tsx",
+      "label": "Aspect Ratio"
+    },
+    {
+      "slug": "avatar",
+      "file": "components/ui/avatar.tsx",
+      "label": "Avatar"
+    },
+    {
+      "slug": "badge",
+      "file": "components/ui/badge.tsx",
+      "label": "Badge"
+    },
+    {
+      "slug": "badges-untitled",
+      "file": "components/ui/badges-untitled.tsx",
+      "label": "Badges Untitled"
+    },
+    {
+      "slug": "breadcrumb",
+      "file": "components/ui/breadcrumb.tsx",
+      "label": "Breadcrumb"
+    },
+    {
+      "slug": "button",
+      "file": "components/ui/button.tsx",
+      "label": "Button"
+    },
+    {
+      "slug": "card",
+      "file": "components/ui/card.tsx",
+      "label": "Card"
+    },
+    {
+      "slug": "chart",
+      "file": "components/ui/chart.tsx",
+      "label": "Chart"
+    },
+    {
+      "slug": "checkbox",
+      "file": "components/ui/checkbox.tsx",
+      "label": "Checkbox"
+    },
+    {
+      "slug": "close-button",
+      "file": "components/ui/close-button.tsx",
+      "label": "Close Button"
+    },
+    {
+      "slug": "collapsible",
+      "file": "components/ui/collapsible.tsx",
+      "label": "Collapsible"
+    },
+    {
+      "slug": "context-menu",
+      "file": "components/ui/context-menu.tsx",
+      "label": "Context Menu"
+    },
+    {
+      "slug": "date-picker",
+      "file": "components/ui/date-picker.tsx",
+      "label": "Date Picker"
+    },
+    {
+      "slug": "dialog",
+      "file": "components/ui/dialog.tsx",
+      "label": "Dialog"
+    },
+    {
+      "slug": "dropdown-menu",
+      "file": "components/ui/dropdown-menu.tsx",
+      "label": "Dropdown Menu"
+    },
+    {
+      "slug": "form",
+      "file": "components/ui/form.tsx",
+      "label": "Form"
+    },
+    {
+      "slug": "hover-card",
+      "file": "components/ui/hover-card.tsx",
+      "label": "Hover Card"
+    },
+    {
+      "slug": "input-otp",
+      "file": "components/ui/input-otp.tsx",
+      "label": "Input Otp"
+    },
+    {
+      "slug": "input",
+      "file": "components/ui/input.tsx",
+      "label": "Input"
+    },
+    {
+      "slug": "label",
+      "file": "components/ui/label.tsx",
+      "label": "Label"
+    },
+    {
+      "slug": "menubar",
+      "file": "components/ui/menubar.tsx",
+      "label": "Menubar"
+    },
+    {
+      "slug": "navigation-menu",
+      "file": "components/ui/navigation-menu.tsx",
+      "label": "Navigation Menu"
+    },
+    {
+      "slug": "pagination-uui",
+      "file": "components/ui/pagination-uui.tsx",
+      "label": "Pagination Uui"
+    },
+    {
+      "slug": "pagination",
+      "file": "components/ui/pagination.tsx",
+      "label": "Pagination"
+    },
+    {
+      "slug": "popover",
+      "file": "components/ui/popover.tsx",
+      "label": "Popover"
+    },
+    {
+      "slug": "procore-logo",
+      "file": "components/ui/procore-logo.tsx",
+      "label": "Procore Logo"
+    },
+    {
+      "slug": "progress",
+      "file": "components/ui/progress.tsx",
+      "label": "Progress"
+    },
+    {
+      "slug": "public-illustration",
+      "file": "components/ui/public-illustration.tsx",
+      "label": "Public Illustration"
+    },
+    {
+      "slug": "radio-group",
+      "file": "components/ui/radio-group.tsx",
+      "label": "Radio Group"
+    },
+    {
+      "slug": "resizable",
+      "file": "components/ui/resizable.tsx",
+      "label": "Resizable"
+    },
+    {
+      "slug": "scroll-area",
+      "file": "components/ui/scroll-area.tsx",
+      "label": "Scroll Area"
+    },
+    {
+      "slug": "select",
+      "file": "components/ui/select.tsx",
+      "label": "Select"
+    },
+    {
+      "slug": "separator",
+      "file": "components/ui/separator.tsx",
+      "label": "Separator"
+    },
+    {
+      "slug": "sheet",
+      "file": "components/ui/sheet.tsx",
+      "label": "Sheet"
+    },
+    {
+      "slug": "sidebar",
+      "file": "components/ui/sidebar.tsx",
+      "label": "Sidebar"
+    },
+    {
+      "slug": "skeleton",
+      "file": "components/ui/skeleton.tsx",
+      "label": "Skeleton"
+    },
+    {
+      "slug": "slide-out",
+      "file": "components/ui/slide-out.tsx",
+      "label": "Slide Out"
+    },
+    {
+      "slug": "slider",
+      "file": "components/ui/slider.tsx",
+      "label": "Slider"
+    },
+    {
+      "slug": "sonner",
+      "file": "components/ui/sonner.tsx",
+      "label": "Sonner"
+    },
+    {
+      "slug": "switch",
+      "file": "components/ui/switch.tsx",
+      "label": "Switch"
+    },
+    {
+      "slug": "table-collection",
+      "file": "components/ui/table-collection.tsx",
+      "label": "Table Collection"
+    },
+    {
+      "slug": "table",
+      "file": "components/ui/table.tsx",
+      "label": "Table"
+    },
+    {
+      "slug": "tabs",
+      "file": "components/ui/tabs.tsx",
+      "label": "Tabs"
+    },
+    {
+      "slug": "textarea",
+      "file": "components/ui/textarea.tsx",
+      "label": "Textarea"
+    },
+    {
+      "slug": "toast",
+      "file": "components/ui/toast.tsx",
+      "label": "Toast"
+    },
+    {
+      "slug": "toaster",
+      "file": "components/ui/toaster.tsx",
+      "label": "Toaster"
+    },
+    {
+      "slug": "toggle-group",
+      "file": "components/ui/toggle-group.tsx",
+      "label": "Toggle Group"
+    },
+    {
+      "slug": "toggle",
+      "file": "components/ui/toggle.tsx",
+      "label": "Toggle"
+    },
+    {
+      "slug": "tooltip-uui",
+      "file": "components/ui/tooltip-uui.tsx",
+      "label": "Tooltip Uui"
+    },
+    {
+      "slug": "tooltip",
+      "file": "components/ui/tooltip.tsx",
+      "label": "Tooltip"
+    },
+    {
+      "slug": "uui-dropdown",
+      "file": "components/ui/uui-dropdown.tsx",
+      "label": "Uui Dropdown"
+    }
+  ]
+}
