@@ -600,6 +600,14 @@ export const PROJECT_TOOLS: Record<string, ToolDefinition> = {
     path: "/instructions",
     context: "project",
   },
+  "directory-project": {
+    id: "directory-project",
+    name: "Directory",
+    category: "platform",
+    icon: RiTeamFill,
+    path: "/directory",
+    context: "project",
+  },
   "admin-project": {
     id: "admin-project",
     name: "Admin",
@@ -729,7 +737,7 @@ export const PROJECT_MENU_SECTIONS: MenuSection[] = [
     icon: RiSettings4Fill,
     illustration: "/illustrations/project-core-platform.png",
     description: "Configuration & setup",
-    tools: ["forms", "instructions", "admin-project"],
+    tools: ["forms", "instructions", "directory-project", "admin-project"],
   },
   {
     id: "advanced-features",

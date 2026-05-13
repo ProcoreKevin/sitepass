@@ -629,6 +629,17 @@ type Worker = {
   timeToSite: string
 }
 
+type ProjectDirectoryContact = {
+  id: string
+  name: string
+  jobTitle: string
+  email: string
+  address: string
+  status: "Invite" | "Re-Invite"
+  companyName: string
+  source?: "site-pass"
+}
+
 const subcontractors: Subcontractor[] = [
   { id: "sc-01", companyName: "Vector Electrical Group", trade: "Electrical", location: "London" },
   { id: "sc-02", companyName: "Pinnacle Mechanical", trade: "HVAC", location: "Manchester" },
@@ -689,11 +700,15 @@ const workersBySubcontractor: Record<string, Worker[]> = {
 }
 
 function SitePassTab() {
+  const awardedCompanyStorageKey = "site-pass-awarded-company-ids"
+  const projectDirectoryStorageKey = "project-directory-added-contacts"
   const [companyOrTrade, setCompanyOrTrade] = useState("")
   const [location, setLocation] = useState("")
   const [isSelectCompanyDialogOpen, setIsSelectCompanyDialogOpen] = useState(false)
   const [dialogCompanyId, setDialogCompanyId] = useState<string | null>(subcontractors[0]?.id ?? null)
   const [selectedWorkerIdsForDirectory, setSelectedWorkerIdsForDirectory] = useState<string[]>([])
+  const [awardedCompanyIds, setAwardedCompanyIds] = useState<string[]>([])
+  const [addedDirectoryContactIds, setAddedDirectoryContactIds] = useState<string[]>([])
   const [projectDirectoryNotice, setProjectDirectoryNotice] = useState<string | null>(null)
   const [selectedSubcontractorId, setSelectedSubcontractorId] = useState<string | null>(subcontractors[0]?.id ?? null)
   const [selectedOtherSubcontractorId, setSelectedOtherSubcontractorId] = useState<string | null>(
@@ -772,6 +787,36 @@ function SitePassTab() {
   const dialogCompany = subcontractors.find((subcontractor) => subcontractor.id === dialogCompanyId) ?? null
   const dialogWorkers = dialogCompanyId ? (workersBySubcontractor[dialogCompanyId] ?? []) : []
 
+  useEffect(() => {
+    const rawAwardedCompanies = window.localStorage.getItem(awardedCompanyStorageKey)
+    if (rawAwardedCompanies) {
+      try {
+        const parsed = JSON.parse(rawAwardedCompanies) as string[]
+        if (Array.isArray(parsed)) {
+          setAwardedCompanyIds(parsed.filter((id): id is string => typeof id === "string"))
+        }
+      } catch {
+        setAwardedCompanyIds([])
+      }
+    }
+
+    const rawDirectoryContacts = window.localStorage.getItem(projectDirectoryStorageKey)
+    if (rawDirectoryContacts) {
+      try {
+        const parsed = JSON.parse(rawDirectoryContacts) as ProjectDirectoryContact[]
+        if (Array.isArray(parsed)) {
+          setAddedDirectoryContactIds(
+            parsed
+              .map((contact) => contact?.id)
+              .filter((id): id is string => typeof id === "string")
+          )
+        }
+      } catch {
+        setAddedDirectoryContactIds([])
+      }
+    }
+  }, [])
+
   const getAverageTimeToSite = (subcontractorId: string) => {
     const workers = workersBySubcontractor[subcontractorId] ?? []
     if (workers.length === 0) return "N/A"
@@ -807,6 +852,51 @@ function SitePassTab() {
 
     const workerCount = selectedWorkerIdsForDirectory.length
     if (workerCount === 0) return
+
+    const workerById = new Map(dialogWorkers.map((worker) => [worker.id, worker]))
+    const slugify = (value: string) =>
+      value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ".")
+        .replace(/(^\.|\.$)/g, "")
+    const companyDomain = slugify(dialogCompany.companyName).replace(/\.+/g, "")
+
+    const newContacts: ProjectDirectoryContact[] = selectedWorkerIdsForDirectory
+      .map((workerId) => {
+        const worker = workerById.get(workerId)
+        if (!worker) return null
+
+        const localName = slugify(worker.name).replace(/\.+/g, ".")
+        return {
+          id: `${dialogCompany.id}-${worker.id}`,
+          name: worker.name,
+          jobTitle: worker.qualifications[0] ?? "Worker",
+          email: `${localName}@${companyDomain}.com`,
+          address: "US",
+          status: "Invite",
+          companyName: dialogCompany.companyName,
+          source: "site-pass",
+        }
+      })
+      .filter((contact): contact is ProjectDirectoryContact => contact !== null)
+
+    if (newContacts.length > 0) {
+      const raw = window.localStorage.getItem(projectDirectoryStorageKey)
+      const existingContacts: ProjectDirectoryContact[] = raw ? (JSON.parse(raw) as ProjectDirectoryContact[]) : []
+      const existingById = new Map(existingContacts.map((contact) => [contact.id, contact]))
+
+      for (const contact of newContacts) {
+        existingById.set(contact.id, contact)
+      }
+
+      const updatedContacts = Array.from(existingById.values())
+      window.localStorage.setItem(projectDirectoryStorageKey, JSON.stringify(updatedContacts))
+      setAddedDirectoryContactIds(updatedContacts.map((contact) => contact.id))
+    }
+
+    const updatedAwardedCompanyIds = Array.from(new Set([...awardedCompanyIds, dialogCompany.id]))
+    setAwardedCompanyIds(updatedAwardedCompanyIds)
+    window.localStorage.setItem(awardedCompanyStorageKey, JSON.stringify(updatedAwardedCompanyIds))
 
     setProjectDirectoryNotice(
       `Added ${workerCount} worker${workerCount === 1 ? "" : "s"} from ${dialogCompany.companyName} to Project Directory.`
@@ -920,6 +1010,11 @@ function SitePassTab() {
                 <span className="inline-flex items-center gap-2 font-medium text-foreground">
                   <RiBuildingLine className="h-4 w-4 text-muted-foreground" />
                   {subcontractor.companyName}
+                  {awardedCompanyIds.includes(subcontractor.id) && (
+                    <span className="inline-flex items-center rounded-full bg-[var(--color-bg-feedback-success)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-success)]">
+                      Awarded
+                    </span>
+                  )}
                   {subcontractor.id === aiSuggestedSubcontractorId && (
                     <span
                       className="inline-flex items-center rounded-full bg-[var(--color-bg-feedback-info)] p-1 text-[var(--color-text-info)]"
@@ -976,7 +1071,14 @@ function SitePassTab() {
                 key={worker.id}
                 className="grid grid-cols-3 items-start gap-4 border-b border-[var(--color-border)] px-4 py-3 text-[length:var(--text-body-size)] last:border-b-0"
               >
-                <span className="font-medium text-foreground">{worker.name}</span>
+                <span className="inline-flex items-center gap-2 font-medium text-foreground">
+                  {worker.name}
+                  {selectedSubcontractorId && addedDirectoryContactIds.includes(`${selectedSubcontractorId}-${worker.id}`) && (
+                    <span className="inline-flex items-center rounded-full bg-[var(--color-bg-feedback-info)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-info)]">
+                      Added to Directory
+                    </span>
+                  )}
+                </span>
                 <div className="flex flex-wrap gap-2">
                   {worker.qualifications.map((qualification) => (
                     <span
