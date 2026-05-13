@@ -33,6 +33,12 @@ import {
   RiTimeLine,
   RiBuildingLine,
   RiSparklingLine,
+  RiCheckboxCircleFill,
+  RiErrorWarningFill,
+  RiCloseCircleFill,
+  RiAlertFill,
+  RiDownloadLine,
+  RiQrCodeLine,
 } from "react-icons/ri"
 import { useNavigation } from "@/lib/navigation-context"
 import { getProjectData, type OpenItem, type TimelinePhase } from "@/lib/project-data"
@@ -629,6 +635,32 @@ type Worker = {
   timeToSite: string
 }
 
+type WorkerRequirement = {
+  id: string
+  title: string
+  expiresLabel: string
+  status: "compliant" | "expiring" | "expired"
+}
+
+type WorkerProfile = {
+  fullNameProvided: boolean
+  tradeAssigned: boolean
+  phoneOnFile: boolean
+  oshaVerified: boolean
+  siteInductionDate: string
+  supervisedBy: string
+  emergencyContactMissing: boolean
+  firstAidStatusText: string
+  firstAidStatus: "expiring" | "expired"
+  inductionDate: string
+  inductionReference: string
+  qrGeneratedDate: string
+  requiredForRoleTitle: string
+  requiredRoleDescription: string
+  requirements: WorkerRequirement[]
+  additionalQualifications: WorkerRequirement[]
+}
+
 type ProjectDirectoryContact = {
   id: string
   name: string
@@ -646,6 +678,46 @@ const subcontractors: Subcontractor[] = [
   { id: "sc-03", companyName: "Atlas Framing Co.", trade: "Framing", location: "Birmingham" },
   { id: "sc-04", companyName: "Blue Ridge Concrete", trade: "Concrete", location: "Leeds" },
   { id: "sc-05", companyName: "Cobalt Fire Protection", trade: "Fire Protection", location: "Glasgow" },
+  { id: "sc-06", companyName: "Summit Steel Works", trade: "Structural Steel", location: "Liverpool" },
+  { id: "sc-07", companyName: "Northshore Masonry", trade: "Masonry", location: "Newcastle" },
+  { id: "sc-08", companyName: "Granite Site Utilities", trade: "Plumbing", location: "Bristol" },
+  { id: "sc-09", companyName: "Skyline Drywall Systems", trade: "Drywall", location: "Sheffield" },
+  { id: "sc-10", companyName: "Beacon Painting Ltd.", trade: "Painting", location: "Nottingham" },
+  { id: "sc-11", companyName: "Ironclad Security Integration", trade: "Security Systems", location: "Leicester" },
+  { id: "sc-12", companyName: "Anchor Earthworks", trade: "Earthworks", location: "Cardiff" },
+  { id: "sc-13", companyName: "Prime Site Utilities", trade: "Utilities", location: "Southampton" },
+  { id: "sc-14", companyName: "Heritage Glazing", trade: "Glazing", location: "Coventry" },
+  { id: "sc-15", companyName: "Crescent Elevation", trade: "Elevators", location: "Reading" },
+  { id: "sc-16", companyName: "Ridgeway Electrical", trade: "Electrical", location: "Oxford" },
+  { id: "sc-17", companyName: "Sterling Mechanical Services", trade: "HVAC", location: "Derby" },
+  { id: "sc-18", companyName: "Urban Frame Installers", trade: "Framing", location: "Plymouth" },
+  { id: "sc-19", companyName: "Bedrock Concrete Partners", trade: "Concrete", location: "Stoke-on-Trent" },
+  { id: "sc-20", companyName: "Guardian Fire Systems", trade: "Fire Protection", location: "Swansea" },
+  { id: "sc-21", companyName: "Titan Steel Fabrication", trade: "Structural Steel", location: "Milton Keynes" },
+  { id: "sc-22", companyName: "Cornerstone Brick & Block", trade: "Masonry", location: "Luton" },
+  { id: "sc-23", companyName: "Flowline Plumbing Group", trade: "Plumbing", location: "Portsmouth" },
+  { id: "sc-24", companyName: "Interior Axis Drywall", trade: "Drywall", location: "York" },
+  { id: "sc-25", companyName: "Palette Pro Coatings", trade: "Painting", location: "Aberdeen" },
+  { id: "sc-26", companyName: "SecureGrid Controls", trade: "Security Systems", location: "Dundee" },
+  { id: "sc-27", companyName: "Westfield Earthmoving", trade: "Earthworks", location: "Exeter" },
+  { id: "sc-28", companyName: "Metro Utility Builders", trade: "Utilities", location: "Norwich" },
+  { id: "sc-29", companyName: "Clearview Glass & Facades", trade: "Glazing", location: "Hull" },
+  { id: "sc-30", companyName: "Ascend Lift Specialists", trade: "Elevators", location: "Middlesbrough" },
+  { id: "sc-31", companyName: "Crownline Electrical", trade: "Electrical", location: "Cambridge" },
+  { id: "sc-32", companyName: "Everest Climate Solutions", trade: "HVAC", location: "Belfast" },
+  { id: "sc-33", companyName: "Timberline Framing Co.", trade: "Framing", location: "Edinburgh" },
+  { id: "sc-34", companyName: "Solidbase Concrete Ltd.", trade: "Concrete", location: "Wolverhampton" },
+  { id: "sc-35", companyName: "ShieldOne Fire Protection", trade: "Fire Protection", location: "Brighton" },
+  { id: "sc-36", companyName: "ForgePoint Steel", trade: "Structural Steel", location: "Blackpool" },
+  { id: "sc-37", companyName: "Landmark Masonry Group", trade: "Masonry", location: "Preston" },
+  { id: "sc-38", companyName: "RapidFlow Plumbing", trade: "Plumbing", location: "Peterborough" },
+  { id: "sc-39", companyName: "Whitecap Drywall", trade: "Drywall", location: "Ipswich" },
+  { id: "sc-40", companyName: "NorthStar Painting", trade: "Painting", location: "Bournemouth" },
+  { id: "sc-41", companyName: "SignalSafe Security", trade: "Security Systems", location: "Chelmsford" },
+  { id: "sc-42", companyName: "TerraCore Earthworks", trade: "Earthworks", location: "Gloucester" },
+  { id: "sc-43", companyName: "Gridline Utility Contractors", trade: "Utilities", location: "Salford" },
+  { id: "sc-44", companyName: "Crystal Span Glazing", trade: "Glazing", location: "Maidstone" },
+  { id: "sc-45", companyName: "Vertical Transit Engineers", trade: "Elevators", location: "Warrington" },
 ]
 
 const otherSubcontractors: Subcontractor[] = [
@@ -655,47 +727,72 @@ const otherSubcontractors: Subcontractor[] = [
   { id: "osc-04", companyName: "Summit Roofing Services", trade: "Roofing", location: "Sheffield" },
 ]
 
-const workersBySubcontractor: Record<string, Worker[]> = {
-  "sc-01": [
-    { id: "w-001", name: "Miguel Santos", qualifications: ["CSCS card", "Asbestos Awareness", "IEC"], timeToSite: "35 min" },
-    { id: "w-002", name: "Alyssa Tran", qualifications: ["CSCS card", "IEC"], timeToSite: "28 min" },
-    { id: "w-003", name: "Darnell Price", qualifications: ["Asbestos Awareness", "IEC"], timeToSite: "42 min" },
+const workerFirstNames = [
+  "Avery", "Jordan", "Taylor", "Morgan", "Riley", "Cameron", "Parker", "Hayden", "Rowan", "Dakota",
+  "Skyler", "Quinn", "Sawyer", "Reese", "Emerson", "Finley", "Kendall", "Alex", "Casey", "Blake",
+]
+const workerLastNames = [
+  "Santos", "Nguyen", "Patel", "Brooks", "Kim", "Lopez", "Murphy", "Carter", "Singh", "Reed",
+  "Flores", "Bennett", "Wright", "Hayes", "Ramirez", "Fisher", "Ward", "Perry", "Russell", "Diaz",
+]
+const workerQualificationSets: Worker["qualifications"][] = [
+  ["CSCS card"],
+  ["IEC"],
+  ["Asbestos Awareness"],
+  ["CSCS card", "IEC"],
+  ["CSCS card", "Asbestos Awareness"],
+  ["Asbestos Awareness", "IEC"],
+  ["CSCS card", "Asbestos Awareness", "IEC"],
+]
+
+const allSubcontractorIds = [...subcontractors, ...otherSubcontractors].map((subcontractor) => subcontractor.id)
+
+const workersBySubcontractor: Record<string, Worker[]> = Object.fromEntries(
+  allSubcontractorIds.map((subcontractorId, subcontractorIndex) => {
+    const workerCount = 9 + ((subcontractorIndex * 7) % 61) // 9-69 workers per company
+
+    const workers: Worker[] = Array.from({ length: workerCount }, (_, workerIndex) => {
+      const nameSeed = subcontractorIndex * 17 + workerIndex
+      const firstName = workerFirstNames[nameSeed % workerFirstNames.length]
+      const lastName = workerLastNames[(nameSeed * 3) % workerLastNames.length]
+      const qualifications = workerQualificationSets[(subcontractorIndex + workerIndex) % workerQualificationSets.length]
+      const timeToSiteMinutes = 18 + ((subcontractorIndex * 11 + workerIndex * 5) % 57)
+
+      return {
+        id: `${subcontractorId}-w-${String(workerIndex + 1).padStart(2, "0")}`,
+        name: `${firstName} ${lastName}`,
+        qualifications,
+        timeToSite: `${timeToSiteMinutes} min`,
+      }
+    })
+
+    return [subcontractorId, workers]
+  })
+)
+
+const workerProfileTemplate: WorkerProfile = {
+  fullNameProvided: true,
+  tradeAssigned: true,
+  phoneOnFile: true,
+  oshaVerified: true,
+  siteInductionDate: "Apr 18, 2026",
+  supervisedBy: "Sarah Chen",
+  emergencyContactMissing: true,
+  firstAidStatusText: "First Aid / CPR expiring 12 days",
+  firstAidStatus: "expiring",
+  inductionDate: "Apr 18, 2026",
+  inductionReference: "IND-2026-W-0014",
+  qrGeneratedDate: "Apr 18, 2026",
+  requiredForRoleTitle: "Foreman Electrician",
+  requiredRoleDescription: "Qualifications required by this worker's role",
+  requirements: [
+    { id: "osha-30", title: "OSHA 30-Hour", expiresLabel: "Does not expire", status: "compliant" },
+    { id: "first-aid", title: "First Aid / CPR", expiresLabel: "Expires May 3, 2026", status: "expiring" },
+    { id: "arc-flash", title: "Arc Flash Certification", expiresLabel: "Expires Apr 21, 2027", status: "compliant" },
+    { id: "confined-space", title: "Confined Space Entry", expiresLabel: "Expired Apr 2, 2026", status: "expired" },
   ],
-  "sc-02": [
-    { id: "w-004", name: "Noah Patel", qualifications: ["CSCS card", "Asbestos Awareness"], timeToSite: "31 min" },
-    { id: "w-005", name: "Elena Garcia", qualifications: ["CSCS card", "IEC"], timeToSite: "24 min" },
-  ],
-  "sc-03": [
-    { id: "w-006", name: "Trevor Kim", qualifications: ["CSCS card"], timeToSite: "37 min" },
-    { id: "w-007", name: "Bianca Hall", qualifications: ["CSCS card", "Asbestos Awareness"], timeToSite: "29 min" },
-  ],
-  "sc-04": [
-    { id: "w-008", name: "Liam Turner", qualifications: ["CSCS card", "IEC"], timeToSite: "33 min" },
-    { id: "w-009", name: "Priya Rao", qualifications: ["Asbestos Awareness"], timeToSite: "46 min" },
-  ],
-  "sc-05": [
-    { id: "w-010", name: "Owen Murphy", qualifications: ["CSCS card", "Asbestos Awareness", "IEC"], timeToSite: "26 min" },
-    { id: "w-011", name: "Hannah Brooks", qualifications: ["CSCS card"], timeToSite: "39 min" },
-  ],
-  "osc-01": [
-    { id: "w-012", name: "Jacob Stewart", qualifications: ["CSCS card"], timeToSite: "41 min" },
-    { id: "w-013", name: "Sophie Ahmed", qualifications: ["Asbestos Awareness"], timeToSite: "34 min" },
-    { id: "w-014", name: "Connor Reed", qualifications: ["IEC"], timeToSite: "48 min" },
-    { id: "w-015", name: "Luca Barnes", qualifications: ["CSCS card", "IEC"], timeToSite: "27 min" },
-  ],
-  "osc-02": [
-    { id: "w-016", name: "Ruby Collins", qualifications: ["CSCS card"], timeToSite: "36 min" },
-    { id: "w-017", name: "George Webb", qualifications: ["CSCS card", "Asbestos Awareness"], timeToSite: "32 min" },
-    { id: "w-018", name: "Mia Foster", qualifications: ["IEC"], timeToSite: "44 min" },
-  ],
-  "osc-03": [
-    { id: "w-019", name: "Adam Flynn", qualifications: ["CSCS card", "IEC"], timeToSite: "30 min" },
-    { id: "w-020", name: "Chloe Davies", qualifications: ["CSCS card"], timeToSite: "38 min" },
-  ],
-  "osc-04": [
-    { id: "w-021", name: "Riley Cooper", qualifications: ["Asbestos Awareness"], timeToSite: "43 min" },
-    { id: "w-022", name: "Ella Grant", qualifications: ["CSCS card", "IEC"], timeToSite: "25 min" },
-    { id: "w-023", name: "Harvey Price", qualifications: ["CSCS card"], timeToSite: "40 min" },
+  additionalQualifications: [
+    { id: "fall-protection", title: "Fall Protection", expiresLabel: "Expires Jun 28, 2026", status: "compliant" },
   ],
 }
 
@@ -710,10 +807,15 @@ function SitePassTab() {
   const [awardedCompanyIds, setAwardedCompanyIds] = useState<string[]>([])
   const [addedDirectoryContactIds, setAddedDirectoryContactIds] = useState<string[]>([])
   const [projectDirectoryNotice, setProjectDirectoryNotice] = useState<string | null>(null)
+  const [activeQualificationFilter, setActiveQualificationFilter] = useState<string | null>(null)
   const [selectedSubcontractorId, setSelectedSubcontractorId] = useState<string | null>(subcontractors[0]?.id ?? null)
   const [selectedOtherSubcontractorId, setSelectedOtherSubcontractorId] = useState<string | null>(
     otherSubcontractors[0]?.id ?? null
   )
+  const [selectedWorkerForModal, setSelectedWorkerForModal] = useState<{
+    worker: Worker
+    subcontractor: Subcontractor
+  } | null>(null)
 
   const normalizedCompanyOrTrade = companyOrTrade.trim().toLowerCase()
   const normalizedLocation = location.trim().toLowerCase()
@@ -758,6 +860,10 @@ function SitePassTab() {
   }, [filteredSubcontractors, selectedSubcontractorId])
 
   useEffect(() => {
+    setActiveQualificationFilter(null)
+  }, [selectedSubcontractorId])
+
+  useEffect(() => {
     if (filteredOtherSubcontractors.length === 0) {
       setSelectedOtherSubcontractorId(null)
       return
@@ -772,14 +878,10 @@ function SitePassTab() {
     }
   }, [filteredOtherSubcontractors, selectedOtherSubcontractorId])
 
-  const selectedSubcontractor = filteredSubcontractors.find(
-    (subcontractor) => subcontractor.id === selectedSubcontractorId
-  )
   const selectedOtherSubcontractor = filteredOtherSubcontractors.find(
     (subcontractor) => subcontractor.id === selectedOtherSubcontractorId
   )
 
-  const selectedWorkers = selectedSubcontractorId ? (workersBySubcontractor[selectedSubcontractorId] ?? []) : []
   const selectedOtherSubcontractorWorkerCount = selectedOtherSubcontractorId
     ? (workersBySubcontractor[selectedOtherSubcontractorId] ?? []).length
     : 0
@@ -861,24 +963,24 @@ function SitePassTab() {
         .replace(/(^\.|\.$)/g, "")
     const companyDomain = slugify(dialogCompany.companyName).replace(/\.+/g, "")
 
-    const newContacts: ProjectDirectoryContact[] = selectedWorkerIdsForDirectory
-      .map((workerId) => {
-        const worker = workerById.get(workerId)
-        if (!worker) return null
+    const newContacts = selectedWorkerIdsForDirectory.reduce<ProjectDirectoryContact[]>((contacts, workerId) => {
+      const worker = workerById.get(workerId)
+      if (!worker) return contacts
 
-        const localName = slugify(worker.name).replace(/\.+/g, ".")
-        return {
-          id: `${dialogCompany.id}-${worker.id}`,
-          name: worker.name,
-          jobTitle: worker.qualifications[0] ?? "Worker",
-          email: `${localName}@${companyDomain}.com`,
-          address: "US",
-          status: "Invite",
-          companyName: dialogCompany.companyName,
-          source: "site-pass",
-        }
+      const localName = slugify(worker.name).replace(/\.+/g, ".")
+      contacts.push({
+        id: `${dialogCompany.id}-${worker.id}`,
+        name: worker.name,
+        jobTitle: worker.qualifications[0] ?? "Worker",
+        email: `${localName}@${companyDomain}.com`,
+        address: "US",
+        status: "Invite",
+        companyName: dialogCompany.companyName,
+        source: "site-pass",
       })
-      .filter((contact): contact is ProjectDirectoryContact => contact !== null)
+
+      return contacts
+    }, [])
 
     if (newContacts.length > 0) {
       const raw = window.localStorage.getItem(projectDirectoryStorageKey)
@@ -903,6 +1005,25 @@ function SitePassTab() {
     )
     setIsSelectCompanyDialogOpen(false)
     setSelectedWorkerIdsForDirectory([])
+  }
+
+  const handleResetSelections = () => {
+    setAwardedCompanyIds([])
+    setAddedDirectoryContactIds([])
+    setSelectedWorkerIdsForDirectory([])
+    setProjectDirectoryNotice("Reset selected companies and cleared workers added to Project Directory.")
+    window.localStorage.removeItem(awardedCompanyStorageKey)
+    window.localStorage.removeItem(projectDirectoryStorageKey)
+  }
+
+  const statusChipClassName = (status: WorkerRequirement["status"]) => {
+    if (status === "compliant") {
+      return "bg-[var(--color-bg-feedback-success)] text-[var(--color-text-success)]"
+    }
+    if (status === "expiring") {
+      return "bg-[var(--color-bg-feedback-warning)] text-[var(--color-text-warning)]"
+    }
+    return "bg-[var(--color-bg-feedback-danger)] text-[var(--color-text-danger)]"
   }
 
   return (
@@ -969,13 +1090,16 @@ function SitePassTab() {
             <span className="text-[length:var(--text-sm-size)] text-muted-foreground">
               {filteredSubcontractors.length} result{filteredSubcontractors.length === 1 ? "" : "s"}
             </span>
+            <Button type="button" variant="outline" size="sm" onClick={handleResetSelections}>
+              Reset Selections
+            </Button>
             <Button type="button" variant="outline" size="sm" onClick={openSelectCompanyDialog}>
               Select Company
             </Button>
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-[var(--border-radius-md)] border border-[var(--color-border)]">
+        <div className="max-h-[420px] overflow-y-auto rounded-[var(--border-radius-md)] border border-[var(--color-border)]">
           <div className="grid grid-cols-4 border-b border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-4 py-2 text-[length:var(--text-sm-size)] font-medium text-[var(--color-text-secondary)]">
             <span>Company</span>
             <span>Trade</span>
@@ -988,48 +1112,167 @@ function SitePassTab() {
               No subcontractors found for the current search.
             </div>
           ) : (
-            filteredSubcontractors.map((subcontractor) => (
-              <div
-                key={subcontractor.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => setSelectedSubcontractorId(subcontractor.id)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault()
-                    setSelectedSubcontractorId(subcontractor.id)
-                  }
-                }}
-                className={cn(
-                  "grid grid-cols-4 items-center border-b border-[var(--color-border)] px-4 py-3 text-[length:var(--text-body-size)] last:border-b-0 cursor-pointer transition-colors",
-                  selectedSubcontractorId === subcontractor.id
-                    ? "bg-[var(--color-bg-row-active)]"
-                    : "hover:bg-[var(--color-bg-secondary)]"
-                )}
-              >
-                <span className="inline-flex items-center gap-2 font-medium text-foreground">
-                  <RiBuildingLine className="h-4 w-4 text-muted-foreground" />
-                  {subcontractor.companyName}
-                  {awardedCompanyIds.includes(subcontractor.id) && (
-                    <span className="inline-flex items-center rounded-full bg-[var(--color-bg-feedback-success)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-success)]">
-                      Awarded
+            filteredSubcontractors.map((subcontractor, index) => {
+              const isSelected = selectedSubcontractorId === subcontractor.id
+              const companyWorkers = workersBySubcontractor[subcontractor.id] ?? []
+              const showBottomBorder = index < filteredSubcontractors.length - 1 && !isSelected
+              const qualificationCounts = companyWorkers.reduce<Record<string, number>>((counts, worker) => {
+                worker.qualifications.forEach((qualification) => {
+                  counts[qualification] = (counts[qualification] ?? 0) + 1
+                })
+                return counts
+              }, {})
+              const qualificationKpis = Object.entries(qualificationCounts).sort(([left], [right]) =>
+                left.localeCompare(right)
+              )
+              const filteredCompanyWorkers = activeQualificationFilter
+                ? companyWorkers.filter((worker) => worker.qualifications.includes(activeQualificationFilter))
+                : companyWorkers
+
+              return (
+                <div key={subcontractor.id}>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setSelectedSubcontractorId(subcontractor.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault()
+                        setSelectedSubcontractorId(subcontractor.id)
+                      }
+                    }}
+                    className={cn(
+                      "grid grid-cols-4 items-center px-4 py-3 text-[length:var(--text-body-size)] cursor-pointer transition-colors",
+                      showBottomBorder && "border-b border-[var(--color-border)]",
+                      isSelected
+                        ? "bg-[var(--color-bg-row-active)]"
+                        : "hover:bg-[var(--color-bg-secondary)]"
+                    )}
+                  >
+                    <span className="inline-flex items-center gap-2 font-medium text-foreground">
+                      <RiBuildingLine className="h-4 w-4 text-muted-foreground" />
+                      {subcontractor.companyName}
+                      {awardedCompanyIds.includes(subcontractor.id) && (
+                        <span className="inline-flex items-center rounded-full bg-[var(--color-bg-feedback-success)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-success)]">
+                          Awarded
+                        </span>
+                      )}
+                      {subcontractor.id === aiSuggestedSubcontractorId && (
+                        <span
+                          className="inline-flex items-center rounded-full bg-[var(--color-bg-feedback-info)] p-1 text-[var(--color-text-info)]"
+                          aria-label="Hey Arnold suggested subcontractor"
+                          title="Hey Arnold suggested subcontractor"
+                        >
+                          <RiSparklingLine className="h-3.5 w-3.5" aria-hidden />
+                        </span>
+                      )}
                     </span>
+                    <span className="text-[var(--color-text-primary)]">{subcontractor.trade}</span>
+                    <span className="text-[var(--color-text-secondary)]">{subcontractor.location}</span>
+                    <span className="text-[var(--color-text-secondary)]">{getAverageTimeToSite(subcontractor.id)}</span>
+                  </div>
+
+                  {isSelected && (
+                    <div className="border-b border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-4 py-3">
+                      <p className="mb-2 text-[length:var(--text-sm-size)] font-medium text-[var(--color-text-primary)]">
+                        Workers ({filteredCompanyWorkers.length}
+                        {activeQualificationFilter ? ` of ${companyWorkers.length}` : ""})
+                      </p>
+                      {qualificationKpis.length > 0 && (
+                        <div className="mb-3 flex flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className={cn(
+                              "h-auto px-2.5 py-1 text-[11px]",
+                              !activeQualificationFilter && "border-[var(--color-border-input-focus)]"
+                            )}
+                            onClick={() => setActiveQualificationFilter(null)}
+                          >
+                            All ({companyWorkers.length})
+                          </Button>
+                          {qualificationKpis.map(([qualification, count]) => (
+                            <Button
+                              key={qualification}
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className={cn(
+                                "h-auto px-2.5 py-1 text-[11px]",
+                                activeQualificationFilter === qualification && "border-[var(--color-border-input-focus)]"
+                              )}
+                              onClick={() =>
+                                setActiveQualificationFilter((current) => (current === qualification ? null : qualification))
+                              }
+                            >
+                              {qualification}: {count}
+                            </Button>
+                          ))}
+                        </div>
+                      )}
+                      {filteredCompanyWorkers.length === 0 ? (
+                        <p className="text-[length:var(--text-sm-size)] text-muted-foreground">
+                          No workers match this qualification filter.
+                        </p>
+                      ) : (
+                        <div className="overflow-hidden rounded-[var(--border-radius-sm)] border border-[var(--color-border)] bg-[var(--color-bg-primary)]">
+                          <div className="grid grid-cols-3 border-b border-[var(--color-border)] px-3 py-2 text-[length:var(--text-sm-size)] font-medium text-[var(--color-text-secondary)]">
+                            <span>Worker</span>
+                            <span>Qualifications</span>
+                            <span>Time to Site</span>
+                          </div>
+                          {filteredCompanyWorkers.map((worker) => (
+                            <div
+                              key={worker.id}
+                              role={addedDirectoryContactIds.includes(`${subcontractor.id}-${worker.id}`) ? "button" : undefined}
+                              tabIndex={addedDirectoryContactIds.includes(`${subcontractor.id}-${worker.id}`) ? 0 : -1}
+                              onClick={() => {
+                                if (!addedDirectoryContactIds.includes(`${subcontractor.id}-${worker.id}`)) return
+                                setSelectedWorkerForModal({ worker, subcontractor })
+                              }}
+                              onKeyDown={(event) => {
+                                if (event.key === "Enter" || event.key === " ") {
+                                  event.preventDefault()
+                                  if (!addedDirectoryContactIds.includes(`${subcontractor.id}-${worker.id}`)) return
+                                  setSelectedWorkerForModal({ worker, subcontractor })
+                                }
+                              }}
+                              className={cn(
+                                "grid grid-cols-3 items-start gap-3 border-b border-[var(--color-border)] px-3 py-2 text-[length:var(--text-sm-size)] last:border-b-0 transition-colors",
+                                addedDirectoryContactIds.includes(`${subcontractor.id}-${worker.id}`)
+                                  ? "cursor-pointer hover:bg-[var(--color-bg-secondary)]"
+                                  : "cursor-not-allowed opacity-75"
+                              )}
+                            >
+                              <span className="inline-flex items-center gap-2 font-medium text-foreground">
+                                {worker.name}
+                                {addedDirectoryContactIds.includes(`${subcontractor.id}-${worker.id}`) && (
+                                  <span className="inline-flex items-center rounded-full bg-[var(--color-bg-feedback-info)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-info)]">
+                                    Added to Directory
+                                  </span>
+                                )}
+                              </span>
+                              <div className="flex flex-wrap gap-2">
+                                {worker.qualifications.map((qualification) => (
+                                  <span
+                                    key={qualification}
+                                    className="inline-flex items-center rounded-full bg-[var(--color-bg-secondary)] px-2 py-0.5 text-[11px] text-[var(--color-text-secondary)]"
+                                  >
+                                    {qualification}
+                                  </span>
+                                ))}
+                              </div>
+                              <span className="text-[var(--color-text-secondary)]">{worker.timeToSite}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   )}
-                  {subcontractor.id === aiSuggestedSubcontractorId && (
-                    <span
-                      className="inline-flex items-center rounded-full bg-[var(--color-bg-feedback-info)] p-1 text-[var(--color-text-info)]"
-                      aria-label="Hey Arnold suggested subcontractor"
-                      title="Hey Arnold suggested subcontractor"
-                    >
-                      <RiSparklingLine className="h-3.5 w-3.5" aria-hidden />
-                    </span>
-                  )}
-                </span>
-                <span className="text-[var(--color-text-primary)]">{subcontractor.trade}</span>
-                <span className="text-[var(--color-text-secondary)]">{subcontractor.location}</span>
-                <span className="text-[var(--color-text-secondary)]">{getAverageTimeToSite(subcontractor.id)}</span>
-              </div>
-            ))
+                </div>
+              )
+            })
           )}
         </div>
 
@@ -1038,62 +1281,6 @@ function SitePassTab() {
             <p className="text-[length:var(--text-sm-size)] text-[var(--color-text-info)]">{projectDirectoryNotice}</p>
           </div>
         )}
-      </div>
-
-      <div className="mt-6">
-        <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-[length:var(--text-body-size)] font-semibold text-foreground">Workers</h3>
-          {selectedSubcontractor && (
-            <span className="text-[length:var(--text-sm-size)] text-muted-foreground">
-              {selectedSubcontractor.companyName}
-            </span>
-          )}
-        </div>
-
-        <div className="overflow-hidden rounded-[var(--border-radius-md)] border border-[var(--color-border)]">
-          <div className="grid grid-cols-3 border-b border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-4 py-2 text-[length:var(--text-sm-size)] font-medium text-[var(--color-text-secondary)]">
-            <span>Worker</span>
-            <span>Qualifications</span>
-            <span>Time to Site</span>
-          </div>
-
-          {!selectedSubcontractor ? (
-            <div className="px-4 py-8 text-center text-[length:var(--text-sm-size)] text-muted-foreground">
-              Select a subcontractor to view workers.
-            </div>
-          ) : selectedWorkers.length === 0 ? (
-            <div className="px-4 py-8 text-center text-[length:var(--text-sm-size)] text-muted-foreground">
-              No workers available for this subcontractor.
-            </div>
-          ) : (
-            selectedWorkers.map((worker) => (
-              <div
-                key={worker.id}
-                className="grid grid-cols-3 items-start gap-4 border-b border-[var(--color-border)] px-4 py-3 text-[length:var(--text-body-size)] last:border-b-0"
-              >
-                <span className="inline-flex items-center gap-2 font-medium text-foreground">
-                  {worker.name}
-                  {selectedSubcontractorId && addedDirectoryContactIds.includes(`${selectedSubcontractorId}-${worker.id}`) && (
-                    <span className="inline-flex items-center rounded-full bg-[var(--color-bg-feedback-info)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-info)]">
-                      Added to Directory
-                    </span>
-                  )}
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {worker.qualifications.map((qualification) => (
-                    <span
-                      key={qualification}
-                      className="inline-flex items-center rounded-full bg-[var(--color-bg-secondary)] px-2 py-0.5 text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]"
-                    >
-                      {qualification}
-                    </span>
-                  ))}
-                </div>
-                <span className="text-[var(--color-text-secondary)]">{worker.timeToSite}</span>
-              </div>
-            ))
-          )}
-        </div>
       </div>
 
       <div className="mt-6">
@@ -1242,6 +1429,251 @@ function SitePassTab() {
               Add to Project Directory
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(selectedWorkerForModal)}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            setSelectedWorkerForModal(null)
+          }
+        }}
+      >
+        <DialogContent className="max-w-[720px] p-0 overflow-hidden">
+          {selectedWorkerForModal && (
+            <div className="bg-[var(--color-bg-secondary)]">
+              <div className="border-b border-[var(--color-border)] bg-[var(--color-bg-primary)] px-5 py-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <h3 className="text-[length:var(--text-h3-size)] font-semibold text-foreground">
+                      {selectedWorkerForModal.worker.name}
+                    </h3>
+                    <p className="mt-0.5 text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]">
+                      {selectedWorkerForModal.subcontractor.companyName}
+                    </p>
+                  </div>
+                  <span className="inline-flex items-center rounded-full bg-[var(--color-bg-feedback-success)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-success)]">
+                    Active
+                  </span>
+                </div>
+              </div>
+
+              <div className="max-h-[70vh] overflow-y-auto px-5 py-4 space-y-4">
+                <section className="rounded-[var(--border-radius-md)] border border-[var(--color-border)] bg-[var(--color-bg-primary)] p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <p className="text-[length:var(--text-body-size)] font-semibold text-foreground">
+                      Profile Status - 5 of 7 complete
+                    </p>
+                  </div>
+                  <div className="space-y-1.5 text-[length:var(--text-sm-size)]">
+                    {workerProfileTemplate.fullNameProvided && (
+                      <p className="inline-flex items-center gap-2 text-[var(--color-text-primary)]">
+                        <RiCheckboxCircleFill className="h-4 w-4 text-[var(--color-text-success)]" />
+                        Full name provided
+                      </p>
+                    )}
+                    {workerProfileTemplate.tradeAssigned && (
+                      <p className="inline-flex items-center gap-2 text-[var(--color-text-primary)]">
+                        <RiCheckboxCircleFill className="h-4 w-4 text-[var(--color-text-success)]" />
+                        Trade assigned
+                      </p>
+                    )}
+                    {workerProfileTemplate.phoneOnFile && (
+                      <p className="inline-flex items-center gap-2 text-[var(--color-text-primary)]">
+                        <RiCheckboxCircleFill className="h-4 w-4 text-[var(--color-text-success)]" />
+                        Phone number on file
+                      </p>
+                    )}
+                    {workerProfileTemplate.oshaVerified && (
+                      <p className="inline-flex items-center gap-2 text-[var(--color-text-primary)]">
+                        <RiCheckboxCircleFill className="h-4 w-4 text-[var(--color-text-success)]" />
+                        OSHA 30-Hour verified
+                      </p>
+                    )}
+                    <p className="inline-flex items-center gap-2 text-[var(--color-text-primary)]">
+                      <RiCheckboxCircleFill className="h-4 w-4 text-[var(--color-text-success)]" />
+                      Site induction completed on {workerProfileTemplate.siteInductionDate}
+                      <span className="ml-1 text-[var(--color-text-secondary)]">
+                        Supervised by {workerProfileTemplate.supervisedBy}
+                      </span>
+                    </p>
+                    {workerProfileTemplate.emergencyContactMissing && (
+                      <p className="inline-flex items-center gap-2 text-[var(--color-text-danger)]">
+                        <RiCloseCircleFill className="h-4 w-4" />
+                        Emergency contact missing
+                      </p>
+                    )}
+                    <p
+                      className={cn(
+                        "inline-flex items-center gap-2",
+                        workerProfileTemplate.firstAidStatus === "expiring"
+                          ? "text-[var(--color-text-warning)]"
+                          : "text-[var(--color-text-danger)]"
+                      )}
+                    >
+                      <RiErrorWarningFill className="h-4 w-4" />
+                      {workerProfileTemplate.firstAidStatusText}
+                    </p>
+                  </div>
+                </section>
+
+                <section className="rounded-[var(--border-radius-md)] border border-[var(--color-border)] bg-[var(--color-bg-primary)] p-4 space-y-4">
+                  <div>
+                    <p className="text-[length:var(--text-sm-size)] uppercase tracking-wide text-[var(--color-text-secondary)]">
+                      Site Induction
+                    </p>
+                    <div className="mt-2 flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-[length:var(--text-body-size)] font-semibold text-foreground">
+                          Induction Complete
+                        </p>
+                        <p className="text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]">
+                          Completed {workerProfileTemplate.inductionDate}
+                        </p>
+                        <p className="text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]">
+                          Supervised by {workerProfileTemplate.supervisedBy}
+                        </p>
+                        <p className="mt-1 text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]">
+                          Reference: {workerProfileTemplate.inductionReference}
+                        </p>
+                      </div>
+                      <span className="inline-flex items-center rounded-full bg-[var(--color-bg-feedback-success)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-success)]">
+                        Complete
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-[var(--color-border)] pt-4">
+                    <p className="text-[length:var(--text-sm-size)] uppercase tracking-wide text-[var(--color-text-secondary)]">
+                      Worker Identity - QR
+                    </p>
+                    <div className="mt-2 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded bg-black text-white">
+                          <RiQrCodeLine className="h-7 w-7" />
+                        </div>
+                        <div>
+                          <p className="text-[length:var(--text-body-size)] font-semibold text-foreground">
+                            {selectedWorkerForModal.worker.name}
+                          </p>
+                          <p className="text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]">
+                            {selectedWorkerForModal.subcontractor.companyName}
+                          </p>
+                          <p className="text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]">
+                            Generated {workerProfileTemplate.qrGeneratedDate}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="inline-flex items-center rounded-full bg-[var(--color-bg-feedback-success)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-success)]">
+                        Generated
+                      </span>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button type="button" variant="outline" size="sm" iconLeading={RiDownloadLine}>
+                        Download PDF
+                      </Button>
+                      <Button type="button" variant="outline" size="sm">
+                        Print
+                      </Button>
+                      <Button type="button" variant="ghost" size="sm">
+                        Regenerate
+                      </Button>
+                      <Button type="button" variant="ghost" size="sm" className="text-[var(--color-text-danger)]">
+                        Deactivate
+                      </Button>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="rounded-[var(--border-radius-md)] border border-[var(--color-border)] bg-[var(--color-bg-primary)] p-4">
+                  <div className="mb-3 flex items-center gap-4 border-b border-[var(--color-border)] pb-2">
+                    <p className="text-[length:var(--text-body-size)] font-semibold text-foreground">Qualifications</p>
+                    <p className="text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]">Activity</p>
+                    <p className="text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]">Projects</p>
+                  </div>
+
+                  <div>
+                    <p className="text-[length:var(--text-sm-size)] uppercase tracking-wide text-[var(--color-text-secondary)]">
+                      Required for {workerProfileTemplate.requiredForRoleTitle}
+                    </p>
+                    <p className="mb-3 text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]">
+                      {workerProfileTemplate.requiredRoleDescription}
+                    </p>
+                    <div className="space-y-3">
+                      {workerProfileTemplate.requirements.map((requirement) => (
+                        <div key={requirement.id} className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-[length:var(--text-body-size)] font-medium text-foreground">{requirement.title}</p>
+                            <p className="text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]">
+                              {requirement.expiresLabel}
+                            </p>
+                          </div>
+                          <span
+                            className={cn(
+                              "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap",
+                              statusChipClassName(requirement.status)
+                            )}
+                          >
+                            {requirement.status === "compliant"
+                              ? "Compliant"
+                              : requirement.status === "expiring"
+                              ? "Expiring Soon"
+                              : "Expired"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-5 border-t border-[var(--color-border)] pt-4">
+                    <p className="text-[length:var(--text-sm-size)] uppercase tracking-wide text-[var(--color-text-secondary)]">
+                      Additional Qualifications
+                    </p>
+                    <p className="mb-3 text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]">
+                      Qualifications uploaded beyond what this role requires
+                    </p>
+                    <div className="space-y-3">
+                      {workerProfileTemplate.additionalQualifications.map((qualification) => (
+                        <div key={qualification.id} className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-[length:var(--text-body-size)] font-medium text-foreground">{qualification.title}</p>
+                            <p className="text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]">
+                              {qualification.expiresLabel}
+                            </p>
+                          </div>
+                          <span
+                            className={cn(
+                              "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap",
+                              statusChipClassName(qualification.status)
+                            )}
+                          >
+                            Compliant
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-5 rounded-[var(--border-radius-md)] border border-[var(--color-border-input-focus)] bg-[var(--color-bg-feedback-info)] px-3 py-2">
+                    <p className="inline-flex items-center gap-2 text-[length:var(--text-sm-size)] font-medium text-[var(--color-text-info)]">
+                      <RiAlertFill className="h-4 w-4" />
+                      Active Update Requests: Requesting First Aid / CPR, Fall Protection
+                    </p>
+                  </div>
+                </section>
+              </div>
+
+              <div className="border-t border-[var(--color-border)] bg-[var(--color-bg-primary)] px-5 py-3">
+                <div className="flex items-center justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => setSelectedWorkerForModal(null)}>
+                    Close
+                  </Button>
+                  <Button type="button">Request Update</Button>
+                </div>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </Card>
