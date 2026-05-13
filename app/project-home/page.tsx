@@ -4,6 +4,16 @@ import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +23,7 @@ import {
 import {
   RiMoreFill,
   RiMapPinLine,
+  RiSearchLine,
   RiCalendarLine,
   RiExternalLinkLine,
   RiFileTextLine,
@@ -20,6 +31,8 @@ import {
   RiCheckboxLine,
   RiCalendar2Line,
   RiTimeLine,
+  RiBuildingLine,
+  RiSparklingLine,
 } from "react-icons/ri"
 import { useNavigation } from "@/lib/navigation-context"
 import { getProjectData, type OpenItem, type TimelinePhase } from "@/lib/project-data"
@@ -600,6 +613,539 @@ function OverviewTab() {
   )
 }
 
+// ─── Site Pass Tab ────────────────────────────────────────────────────────────
+
+type Subcontractor = {
+  id: string
+  companyName: string
+  trade: string
+  location: string
+}
+
+type Worker = {
+  id: string
+  name: string
+  qualifications: string[]
+  timeToSite: string
+}
+
+const subcontractors: Subcontractor[] = [
+  { id: "sc-01", companyName: "Vector Electrical Group", trade: "Electrical", location: "London" },
+  { id: "sc-02", companyName: "Pinnacle Mechanical", trade: "HVAC", location: "Manchester" },
+  { id: "sc-03", companyName: "Atlas Framing Co.", trade: "Framing", location: "Birmingham" },
+  { id: "sc-04", companyName: "Blue Ridge Concrete", trade: "Concrete", location: "Leeds" },
+  { id: "sc-05", companyName: "Cobalt Fire Protection", trade: "Fire Protection", location: "Glasgow" },
+]
+
+const otherSubcontractors: Subcontractor[] = [
+  { id: "osc-01", companyName: "Northline Groundworks", trade: "Groundworks", location: "Bristol" },
+  { id: "osc-02", companyName: "Harborline Scaffolding", trade: "Scaffolding", location: "Liverpool" },
+  { id: "osc-03", companyName: "Redwood Interiors", trade: "Interior Fit-Out", location: "Nottingham" },
+  { id: "osc-04", companyName: "Summit Roofing Services", trade: "Roofing", location: "Sheffield" },
+]
+
+const workersBySubcontractor: Record<string, Worker[]> = {
+  "sc-01": [
+    { id: "w-001", name: "Miguel Santos", qualifications: ["CSCS card", "Asbestos Awareness", "IEC"], timeToSite: "35 min" },
+    { id: "w-002", name: "Alyssa Tran", qualifications: ["CSCS card", "IEC"], timeToSite: "28 min" },
+    { id: "w-003", name: "Darnell Price", qualifications: ["Asbestos Awareness", "IEC"], timeToSite: "42 min" },
+  ],
+  "sc-02": [
+    { id: "w-004", name: "Noah Patel", qualifications: ["CSCS card", "Asbestos Awareness"], timeToSite: "31 min" },
+    { id: "w-005", name: "Elena Garcia", qualifications: ["CSCS card", "IEC"], timeToSite: "24 min" },
+  ],
+  "sc-03": [
+    { id: "w-006", name: "Trevor Kim", qualifications: ["CSCS card"], timeToSite: "37 min" },
+    { id: "w-007", name: "Bianca Hall", qualifications: ["CSCS card", "Asbestos Awareness"], timeToSite: "29 min" },
+  ],
+  "sc-04": [
+    { id: "w-008", name: "Liam Turner", qualifications: ["CSCS card", "IEC"], timeToSite: "33 min" },
+    { id: "w-009", name: "Priya Rao", qualifications: ["Asbestos Awareness"], timeToSite: "46 min" },
+  ],
+  "sc-05": [
+    { id: "w-010", name: "Owen Murphy", qualifications: ["CSCS card", "Asbestos Awareness", "IEC"], timeToSite: "26 min" },
+    { id: "w-011", name: "Hannah Brooks", qualifications: ["CSCS card"], timeToSite: "39 min" },
+  ],
+  "osc-01": [
+    { id: "w-012", name: "Jacob Stewart", qualifications: ["CSCS card"], timeToSite: "41 min" },
+    { id: "w-013", name: "Sophie Ahmed", qualifications: ["Asbestos Awareness"], timeToSite: "34 min" },
+    { id: "w-014", name: "Connor Reed", qualifications: ["IEC"], timeToSite: "48 min" },
+    { id: "w-015", name: "Luca Barnes", qualifications: ["CSCS card", "IEC"], timeToSite: "27 min" },
+  ],
+  "osc-02": [
+    { id: "w-016", name: "Ruby Collins", qualifications: ["CSCS card"], timeToSite: "36 min" },
+    { id: "w-017", name: "George Webb", qualifications: ["CSCS card", "Asbestos Awareness"], timeToSite: "32 min" },
+    { id: "w-018", name: "Mia Foster", qualifications: ["IEC"], timeToSite: "44 min" },
+  ],
+  "osc-03": [
+    { id: "w-019", name: "Adam Flynn", qualifications: ["CSCS card", "IEC"], timeToSite: "30 min" },
+    { id: "w-020", name: "Chloe Davies", qualifications: ["CSCS card"], timeToSite: "38 min" },
+  ],
+  "osc-04": [
+    { id: "w-021", name: "Riley Cooper", qualifications: ["Asbestos Awareness"], timeToSite: "43 min" },
+    { id: "w-022", name: "Ella Grant", qualifications: ["CSCS card", "IEC"], timeToSite: "25 min" },
+    { id: "w-023", name: "Harvey Price", qualifications: ["CSCS card"], timeToSite: "40 min" },
+  ],
+}
+
+function SitePassTab() {
+  const [companyOrTrade, setCompanyOrTrade] = useState("")
+  const [location, setLocation] = useState("")
+  const [isSelectCompanyDialogOpen, setIsSelectCompanyDialogOpen] = useState(false)
+  const [dialogCompanyId, setDialogCompanyId] = useState<string | null>(subcontractors[0]?.id ?? null)
+  const [selectedWorkerIdsForDirectory, setSelectedWorkerIdsForDirectory] = useState<string[]>([])
+  const [projectDirectoryNotice, setProjectDirectoryNotice] = useState<string | null>(null)
+  const [selectedSubcontractorId, setSelectedSubcontractorId] = useState<string | null>(subcontractors[0]?.id ?? null)
+  const [selectedOtherSubcontractorId, setSelectedOtherSubcontractorId] = useState<string | null>(
+    otherSubcontractors[0]?.id ?? null
+  )
+
+  const normalizedCompanyOrTrade = companyOrTrade.trim().toLowerCase()
+  const normalizedLocation = location.trim().toLowerCase()
+
+  const filteredSubcontractors = subcontractors.filter((subcontractor) => {
+    const matchesCompanyOrTrade =
+      !normalizedCompanyOrTrade ||
+      subcontractor.companyName.toLowerCase().includes(normalizedCompanyOrTrade) ||
+      subcontractor.trade.toLowerCase().includes(normalizedCompanyOrTrade)
+
+    const matchesLocation =
+      !normalizedLocation || subcontractor.location.toLowerCase().includes(normalizedLocation)
+
+    return matchesCompanyOrTrade && matchesLocation
+  })
+
+  const filteredOtherSubcontractors = otherSubcontractors.filter((subcontractor) => {
+    const matchesCompanyOrTrade =
+      !normalizedCompanyOrTrade ||
+      subcontractor.companyName.toLowerCase().includes(normalizedCompanyOrTrade) ||
+      subcontractor.trade.toLowerCase().includes(normalizedCompanyOrTrade)
+
+    const matchesLocation =
+      !normalizedLocation || subcontractor.location.toLowerCase().includes(normalizedLocation)
+
+    return matchesCompanyOrTrade && matchesLocation
+  })
+
+  useEffect(() => {
+    if (filteredSubcontractors.length === 0) {
+      setSelectedSubcontractorId(null)
+      return
+    }
+
+    const hasSelectedSubcontractor = filteredSubcontractors.some(
+      (subcontractor) => subcontractor.id === selectedSubcontractorId
+    )
+
+    if (!hasSelectedSubcontractor) {
+      setSelectedSubcontractorId(filteredSubcontractors[0].id)
+    }
+  }, [filteredSubcontractors, selectedSubcontractorId])
+
+  useEffect(() => {
+    if (filteredOtherSubcontractors.length === 0) {
+      setSelectedOtherSubcontractorId(null)
+      return
+    }
+
+    const hasSelectedSubcontractor = filteredOtherSubcontractors.some(
+      (subcontractor) => subcontractor.id === selectedOtherSubcontractorId
+    )
+
+    if (!hasSelectedSubcontractor) {
+      setSelectedOtherSubcontractorId(filteredOtherSubcontractors[0].id)
+    }
+  }, [filteredOtherSubcontractors, selectedOtherSubcontractorId])
+
+  const selectedSubcontractor = filteredSubcontractors.find(
+    (subcontractor) => subcontractor.id === selectedSubcontractorId
+  )
+  const selectedOtherSubcontractor = filteredOtherSubcontractors.find(
+    (subcontractor) => subcontractor.id === selectedOtherSubcontractorId
+  )
+
+  const selectedWorkers = selectedSubcontractorId ? (workersBySubcontractor[selectedSubcontractorId] ?? []) : []
+  const selectedOtherSubcontractorWorkerCount = selectedOtherSubcontractorId
+    ? (workersBySubcontractor[selectedOtherSubcontractorId] ?? []).length
+    : 0
+  const aiSuggestedSubcontractorId = "sc-01"
+  const dialogCompany = subcontractors.find((subcontractor) => subcontractor.id === dialogCompanyId) ?? null
+  const dialogWorkers = dialogCompanyId ? (workersBySubcontractor[dialogCompanyId] ?? []) : []
+
+  const getAverageTimeToSite = (subcontractorId: string) => {
+    const workers = workersBySubcontractor[subcontractorId] ?? []
+    if (workers.length === 0) return "N/A"
+
+    const totalMinutes = workers.reduce((sum, worker) => {
+      const minutes = Number.parseInt(worker.timeToSite.replace(" min", ""), 10)
+      return sum + (Number.isNaN(minutes) ? 0 : minutes)
+    }, 0)
+
+    const averageMinutes = Math.round(totalMinutes / workers.length)
+    return `${averageMinutes} min`
+  }
+
+  const openSelectCompanyDialog = () => {
+    const nextCompanyId = selectedSubcontractorId ?? subcontractors[0]?.id ?? null
+    setDialogCompanyId(nextCompanyId)
+    setSelectedWorkerIdsForDirectory([])
+    setIsSelectCompanyDialogOpen(true)
+  }
+
+  const handleToggleWorkerForDirectory = (workerId: string, checked: boolean) => {
+    setSelectedWorkerIdsForDirectory((previous) => {
+      if (checked) {
+        return previous.includes(workerId) ? previous : [...previous, workerId]
+      }
+
+      return previous.filter((id) => id !== workerId)
+    })
+  }
+
+  const handleAddToProjectDirectory = () => {
+    if (!dialogCompany) return
+
+    const workerCount = selectedWorkerIdsForDirectory.length
+    if (workerCount === 0) return
+
+    setProjectDirectoryNotice(
+      `Added ${workerCount} worker${workerCount === 1 ? "" : "s"} from ${dialogCompany.companyName} to Project Directory.`
+    )
+    setIsSelectCompanyDialogOpen(false)
+    setSelectedWorkerIdsForDirectory([])
+  }
+
+  return (
+    <Card className="bg-card rounded-[var(--border-radius-lg)] border-0 shadow-[var(--shadow-sm)] p-[var(--spacing-card-padding)]">
+      <div className="mb-4">
+        <h2 className="text-[length:var(--text-h3-size)] font-semibold leading-[var(--text-h3-lh)] tracking-[var(--text-h3-ls)] text-foreground">
+          Site Pass
+        </h2>
+        <p className="mt-1 text-[length:var(--text-sm-size)] text-muted-foreground">
+          Search subcontractors by trade, company name, and location.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div>
+          <label
+            htmlFor="site-pass-company-trade"
+            className="mb-2 block text-[length:var(--text-sm-size)] font-medium text-[var(--color-text-secondary)]"
+          >
+            Trade or Company Name
+          </label>
+          <div className="relative">
+            <RiSearchLine className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="site-pass-company-trade"
+              value={companyOrTrade}
+              onChange={(event) => setCompanyOrTrade(event.target.value)}
+              placeholder="Search trade or company"
+              className="pl-9"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label
+            htmlFor="site-pass-location"
+            className="mb-2 block text-[length:var(--text-sm-size)] font-medium text-[var(--color-text-secondary)]"
+          >
+            Location
+          </label>
+          <div className="relative">
+            <RiMapPinLine className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="site-pass-location"
+              value={location}
+              onChange={(event) => setLocation(event.target.value)}
+              placeholder="Search location"
+              className="pl-9"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <div className="mb-3 rounded-[var(--border-radius-md)] border border-[var(--color-border-input-focus)] bg-[var(--color-bg-feedback-info)] px-4 py-3">
+          <p className="text-[length:var(--text-sm-size)] font-medium text-[var(--color-text-info)]">
+            Hey Arnold suggests selecting Vector Electrical Group based on qualifications and time to site.
+          </p>
+        </div>
+
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-[length:var(--text-body-size)] font-semibold text-foreground">Preferred Subcontractors</h3>
+          <div className="flex items-center gap-3">
+            <span className="text-[length:var(--text-sm-size)] text-muted-foreground">
+              {filteredSubcontractors.length} result{filteredSubcontractors.length === 1 ? "" : "s"}
+            </span>
+            <Button type="button" variant="outline" size="sm" onClick={openSelectCompanyDialog}>
+              Select Company
+            </Button>
+          </div>
+        </div>
+
+        <div className="overflow-hidden rounded-[var(--border-radius-md)] border border-[var(--color-border)]">
+          <div className="grid grid-cols-4 border-b border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-4 py-2 text-[length:var(--text-sm-size)] font-medium text-[var(--color-text-secondary)]">
+            <span>Company</span>
+            <span>Trade</span>
+            <span>Location</span>
+            <span>Average Time to Site</span>
+          </div>
+
+          {filteredSubcontractors.length === 0 ? (
+            <div className="px-4 py-8 text-center text-[length:var(--text-sm-size)] text-muted-foreground">
+              No subcontractors found for the current search.
+            </div>
+          ) : (
+            filteredSubcontractors.map((subcontractor) => (
+              <div
+                key={subcontractor.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedSubcontractorId(subcontractor.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault()
+                    setSelectedSubcontractorId(subcontractor.id)
+                  }
+                }}
+                className={cn(
+                  "grid grid-cols-4 items-center border-b border-[var(--color-border)] px-4 py-3 text-[length:var(--text-body-size)] last:border-b-0 cursor-pointer transition-colors",
+                  selectedSubcontractorId === subcontractor.id
+                    ? "bg-[var(--color-bg-row-active)]"
+                    : "hover:bg-[var(--color-bg-secondary)]"
+                )}
+              >
+                <span className="inline-flex items-center gap-2 font-medium text-foreground">
+                  <RiBuildingLine className="h-4 w-4 text-muted-foreground" />
+                  {subcontractor.companyName}
+                  {subcontractor.id === aiSuggestedSubcontractorId && (
+                    <span
+                      className="inline-flex items-center rounded-full bg-[var(--color-bg-feedback-info)] p-1 text-[var(--color-text-info)]"
+                      aria-label="Hey Arnold suggested subcontractor"
+                      title="Hey Arnold suggested subcontractor"
+                    >
+                      <RiSparklingLine className="h-3.5 w-3.5" aria-hidden />
+                    </span>
+                  )}
+                </span>
+                <span className="text-[var(--color-text-primary)]">{subcontractor.trade}</span>
+                <span className="text-[var(--color-text-secondary)]">{subcontractor.location}</span>
+                <span className="text-[var(--color-text-secondary)]">{getAverageTimeToSite(subcontractor.id)}</span>
+              </div>
+            ))
+          )}
+        </div>
+
+        {projectDirectoryNotice && (
+          <div className="mt-3 rounded-[var(--border-radius-md)] border border-[var(--color-border-input-focus)] bg-[var(--color-bg-feedback-info)] px-4 py-3">
+            <p className="text-[length:var(--text-sm-size)] text-[var(--color-text-info)]">{projectDirectoryNotice}</p>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-6">
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-[length:var(--text-body-size)] font-semibold text-foreground">Workers</h3>
+          {selectedSubcontractor && (
+            <span className="text-[length:var(--text-sm-size)] text-muted-foreground">
+              {selectedSubcontractor.companyName}
+            </span>
+          )}
+        </div>
+
+        <div className="overflow-hidden rounded-[var(--border-radius-md)] border border-[var(--color-border)]">
+          <div className="grid grid-cols-3 border-b border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-4 py-2 text-[length:var(--text-sm-size)] font-medium text-[var(--color-text-secondary)]">
+            <span>Worker</span>
+            <span>Qualifications</span>
+            <span>Time to Site</span>
+          </div>
+
+          {!selectedSubcontractor ? (
+            <div className="px-4 py-8 text-center text-[length:var(--text-sm-size)] text-muted-foreground">
+              Select a subcontractor to view workers.
+            </div>
+          ) : selectedWorkers.length === 0 ? (
+            <div className="px-4 py-8 text-center text-[length:var(--text-sm-size)] text-muted-foreground">
+              No workers available for this subcontractor.
+            </div>
+          ) : (
+            selectedWorkers.map((worker) => (
+              <div
+                key={worker.id}
+                className="grid grid-cols-3 items-start gap-4 border-b border-[var(--color-border)] px-4 py-3 text-[length:var(--text-body-size)] last:border-b-0"
+              >
+                <span className="font-medium text-foreground">{worker.name}</span>
+                <div className="flex flex-wrap gap-2">
+                  {worker.qualifications.map((qualification) => (
+                    <span
+                      key={qualification}
+                      className="inline-flex items-center rounded-full bg-[var(--color-bg-secondary)] px-2 py-0.5 text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]"
+                    >
+                      {qualification}
+                    </span>
+                  ))}
+                </div>
+                <span className="text-[var(--color-text-secondary)]">{worker.timeToSite}</span>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-[length:var(--text-body-size)] font-semibold text-foreground">Other Subcontractors</h3>
+          <span className="text-[length:var(--text-sm-size)] text-muted-foreground">
+            {filteredOtherSubcontractors.length} result{filteredOtherSubcontractors.length === 1 ? "" : "s"}
+          </span>
+        </div>
+
+        <div className="overflow-hidden rounded-[var(--border-radius-md)] border border-[var(--color-border)]">
+          <div className="grid grid-cols-3 border-b border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-4 py-2 text-[length:var(--text-sm-size)] font-medium text-[var(--color-text-secondary)]">
+            <span>Company</span>
+            <span>Trade</span>
+            <span>Location</span>
+          </div>
+
+          {filteredOtherSubcontractors.length === 0 ? (
+            <div className="px-4 py-8 text-center text-[length:var(--text-sm-size)] text-muted-foreground">
+              No subcontractors found for the current search.
+            </div>
+          ) : (
+            filteredOtherSubcontractors.map((subcontractor) => (
+              <div
+                key={subcontractor.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedOtherSubcontractorId(subcontractor.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault()
+                    setSelectedOtherSubcontractorId(subcontractor.id)
+                  }
+                }}
+                className={cn(
+                  "grid grid-cols-3 items-center border-b border-[var(--color-border)] px-4 py-3 text-[length:var(--text-body-size)] last:border-b-0 cursor-pointer transition-colors",
+                  selectedOtherSubcontractorId === subcontractor.id
+                    ? "bg-[var(--color-bg-row-active)]"
+                    : "hover:bg-[var(--color-bg-secondary)]"
+                )}
+              >
+                <span className="inline-flex items-center gap-2 font-medium text-foreground">
+                  <RiBuildingLine className="h-4 w-4 text-muted-foreground" />
+                  {subcontractor.companyName}
+                </span>
+                <span className="text-[var(--color-text-primary)]">{subcontractor.trade}</span>
+                <span className="text-[var(--color-text-secondary)]">{subcontractor.location}</span>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="mt-3 rounded-[var(--border-radius-md)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-4 py-3">
+          {!selectedOtherSubcontractor ? (
+            <p className="text-[length:var(--text-sm-size)] text-muted-foreground">
+              Select an other subcontractor to view worker count.
+            </p>
+          ) : (
+            <p className="text-[length:var(--text-body-size)] text-[var(--color-text-primary)]">
+              <span className="font-semibold">{selectedOtherSubcontractor.companyName}</span> has{" "}
+              <span className="font-semibold">{selectedOtherSubcontractorWorkerCount}</span> worker
+              {selectedOtherSubcontractorWorkerCount === 1 ? "" : "s"}.
+            </p>
+          )}
+        </div>
+      </div>
+
+      <Dialog open={isSelectCompanyDialogOpen} onOpenChange={setIsSelectCompanyDialogOpen}>
+        <DialogContent className="max-w-5xl">
+          <DialogHeader>
+            <DialogTitle>Select Company</DialogTitle>
+            <DialogDescription>
+              Choose a company, then select workers to add to the Project Directory.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="rounded-[var(--border-radius-md)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-4 py-2">
+              <p className="text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]">
+                Company:{" "}
+                <span className="font-medium text-[var(--color-text-primary)]">
+                  {dialogCompany?.companyName ?? "No company selected"}
+                </span>
+              </p>
+            </div>
+
+            <div className="overflow-hidden rounded-[var(--border-radius-md)] border border-[var(--color-border)]">
+              <div className="grid grid-cols-[48px_1fr_1fr_120px] border-b border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-4 py-2 text-[length:var(--text-sm-size)] font-medium text-[var(--color-text-secondary)]">
+                <span>Select</span>
+                <span>Worker</span>
+                <span>Qualifications</span>
+                <span>Time to Site</span>
+              </div>
+
+              {dialogWorkers.length === 0 ? (
+                <div className="px-4 py-8 text-center text-[length:var(--text-sm-size)] text-muted-foreground">
+                  No workers found for this company.
+                </div>
+              ) : (
+                dialogWorkers.map((worker) => (
+                  <div
+                    key={worker.id}
+                    className="grid grid-cols-[48px_1fr_1fr_120px] items-start border-b border-[var(--color-border)] px-4 py-3 text-[length:var(--text-body-size)] last:border-b-0"
+                  >
+                    <div className="pt-0.5">
+                      <Checkbox
+                        checked={selectedWorkerIdsForDirectory.includes(worker.id)}
+                        onCheckedChange={(checked) => handleToggleWorkerForDirectory(worker.id, checked === true)}
+                        aria-label={`Select ${worker.name}`}
+                      />
+                    </div>
+                    <span className="font-medium text-foreground">{worker.name}</span>
+                    <div className="flex flex-wrap gap-2">
+                      {worker.qualifications.map((qualification) => (
+                        <span
+                          key={qualification}
+                          className="inline-flex items-center rounded-full bg-[var(--color-bg-secondary)] px-2 py-0.5 text-[length:var(--text-sm-size)] text-[var(--color-text-secondary)]"
+                        >
+                          {qualification}
+                        </span>
+                      ))}
+                    </div>
+                    <span className="text-[var(--color-text-secondary)]">{worker.timeToSite}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setIsSelectCompanyDialogOpen(false)
+                setSelectedWorkerIdsForDirectory([])
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleAddToProjectDirectory}
+              disabled={selectedWorkerIdsForDirectory.length === 0}
+            >
+              Add to Project Directory
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card>
+  )
+}
+
 // ─── Page Content ─────────────────────────────────────────────────────────────
 
 export function ProjectHomeContent() {
@@ -620,6 +1166,7 @@ export function ProjectHomeContent() {
 
   const tabs = [
     { id: "overview",   label: "Overview" },
+    { id: "site-pass",  label: "Site Pass" },
     { id: "drawings",   label: "Drawings" },
     { id: "open-items", label: "Open Items" },
     { id: "financials", label: "Financials" },
@@ -653,7 +1200,8 @@ export function ProjectHomeContent() {
       </div>
       <div className="flex-1 overflow-y-auto p-[var(--spacing-page-margin)]">
         {activeTab === "overview" && <OverviewTab />}
-        {activeTab !== "overview" && (
+        {activeTab === "site-pass" && <SitePassTab />}
+        {activeTab !== "overview" && activeTab !== "site-pass" && (
           <div className="flex items-center justify-center h-64 text-muted-foreground text-sm">
             {tabs.find((t) => t.id === activeTab)?.label} content coming soon
           </div>
